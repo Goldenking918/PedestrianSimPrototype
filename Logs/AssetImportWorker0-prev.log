@@ -1,0 +1,552 @@
+Unity Editor version:    6000.3.5f2 (3fa8bc678cb0)
+Branch:                  6000.3/respin/6000.3.5f1-a1ec4b2f2d19
+Build type:              Release
+Batch mode:              YES
+macOS version:           Version 15.6.1 (Build 24G90)
+Darwin version:          24.6.0
+Architecture:            arm64
+Running under Rosetta:   NO
+Available memory:        16384 MB
+Date:                    2026-06-02T01:55:45Z
+[Licensing::Module] Trying to connect to existing licensing client channel...
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-milestorrington" at "2026-06-02T01:55:45.074309Z"
+
+COMMAND LINE ARGUMENTS:
+/Applications/Unity/Hub/Editor/6000.3.5f2/Unity.app/Contents/MacOS/Unity
+-adb2
+-batchMode
+-noUpm
+-name
+AssetImportWorker0
+-projectPath
+/Users/milestorrington/PedestrianSimPrototype
+-logFile
+Logs/AssetImportWorker0.log
+-srvPort
+57648
+-licensingIpc
+LicenseClient-milestorrington
+-job-worker-count
+4
+-background-job-worker-count
+8
+-gc-helper-count
+1
+-name AssetImport
+Successfully changed project path to: /Users/milestorrington/PedestrianSimPrototype
+/Users/milestorrington/PedestrianSimPrototype
+[UnityMemory] Configuration Parameters - Can be set up in boot.config
+    "memorysetup-allocator-temp-initial-block-size-main=262144"
+    "memorysetup-allocator-temp-initial-block-size-worker=262144"
+    "memorysetup-temp-allocator-size-background-worker=32768"
+    "memorysetup-temp-allocator-size-job-worker=262144"
+    "memorysetup-temp-allocator-size-preload-manager=33554432"
+    "memorysetup-temp-allocator-size-nav-mesh-worker=65536"
+    "memorysetup-temp-allocator-size-audio-worker=65536"
+    "memorysetup-temp-allocator-size-cloud-worker=32768"
+    "memorysetup-bucket-allocator-granularity=16"
+    "memorysetup-bucket-allocator-bucket-count=8"
+    "memorysetup-bucket-allocator-block-size=33554432"
+    "memorysetup-bucket-allocator-block-count=8"
+    "memorysetup-main-allocator-block-size=16777216"
+    "memorysetup-thread-allocator-block-size=16777216"
+    "memorysetup-gfx-main-allocator-block-size=16777216"
+    "memorysetup-gfx-thread-allocator-block-size=16777216"
+    "memorysetup-cache-allocator-block-size=4194304"
+    "memorysetup-typetree-allocator-block-size=2097152"
+    "memorysetup-profiler-bucket-allocator-granularity=16"
+    "memorysetup-profiler-bucket-allocator-bucket-count=8"
+    "memorysetup-profiler-bucket-allocator-block-size=33554432"
+    "memorysetup-profiler-bucket-allocator-block-count=8"
+    "memorysetup-profiler-allocator-block-size=16777216"
+    "memorysetup-profiler-editor-allocator-block-size=1048576"
+    "memorysetup-temp-allocator-size-main=16777216"
+    "memorysetup-job-temp-allocator-block-size=2097152"
+    "memorysetup-job-temp-allocator-block-size-background=1048576"
+    "memorysetup-job-temp-allocator-reduction-small-platforms=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gfx=262144"
+Player connection [8395448512]  Target information:
+
+Player connection [8395448512]  * "[IP] 172.23.2.15 [Port] 0 [Flags] 2 [Guid] 830910143 [EditorId] 830910143 [Version] 1048832 [Id] OSXEditor(0,wifi-172-23-2-15.uoa-wifi.auckland.ac.nz) [Debug] 1 [PackageName] OSXEditor [ProjectName] Editor" 
+
+Player connection [8395448512] Host joined multi-casting on [225.0.0.222:54997]...
+Player connection [8395448512] Host joined alternative multi-casting on [225.0.0.222:34997]...
+JobSystem: Creating JobQueue using job-worker-count value 4
+Input System module state changed to: Initialized.
+[Physics::Module] Initialized fallback backend.
+[Physics::Module] Id: 0xdecafbad
+Library Redirect Path: Library/
+[Physics::Module] Selected backend.
+[Physics::Module] Name: PhysX
+[Physics::Module] Id: 0xf2b8ea05
+[Physics::Module] SDK Version: 4.1.2
+[Physics::Module] Integration Version: 1.0.0
+[Physics::Module] Threading Mode: Multi-Threaded
+Refreshing native plugins compatible for Editor in 2.80 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Initialize engine version: 6000.3.5f2 (3fa8bc678cb0)
+[Subsystems] Discovering subsystems at path /Applications/Unity/Hub/Editor/6000.3.5f2/Unity.app/Contents/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path /Users/milestorrington/PedestrianSimPrototype/Assets
+GfxDevice: creating device client; kGfxThreadingModeNonThreaded
+ preferred device: Apple M4 (high power)
+Metal devices available: 1
+0: Apple M4 (high power)
+Using device Apple M4 (high power)
+Initializing Metal device caps: Apple M4
+Mac GPU Family: 2
+Apple GPU Family: 9
+MSL Version: 3.0
+Has Float MSAA: 1
+Has Float Filtering: 1
+ReadWrite Texture Tier: 2
+Initialize mono
+Mono path[0] = '/Applications/Unity/Hub/Editor/6000.3.5f2/Unity.app/Contents/Resources/Scripting/Managed'
+Mono path[1] = '/Applications/Unity/Hub/Editor/6000.3.5f2/Unity.app/Contents/Resources/Scripting/MonoBleedingEdge/lib/mono/unityjit-macos'
+Mono config path = '/Applications/Unity/Hub/Editor/6000.3.5f2/Unity.app/Contents/Resources/Scripting/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56256
+Begin MonoManager ReloadAssembly
+[Licensing::Client] Handshaking with LicensingClient:
+  Version:                 1.17.4+4293ba1
+  Session Id:              7636f5562c204904b44bfa93c4e48b3d
+  Correlation Id:          be8ff7e17c7e0386641d4fa68859fbe0
+  External correlation Id: 2402836277334319794
+  Machine Id:              rIFAaTKkEZvmDK+PRCS7kAuhCrc=
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-milestorrington" (connect: 0.00s, validation: 0.00s, handshake: 0.47s)
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-milestorrington-notifications" at "2026-06-02T01:55:45.544075Z"
+[Licensing::Module] Licensing Background thread has ended after 0.47s
+Registering precompiled unity dll's ...
+Register platform support module: /Applications/Unity/Hub/Editor/6000.3.5f2/PlaybackEngines/WebGLSupport/UnityEditor.WebGL.Extensions.dll
+Register platform support module: /Applications/Unity/Hub/Editor/6000.3.5f2/Unity.app/Contents/PlaybackEngines/MacStandaloneSupport/UnityEditor.OSXStandalone.Extensions.dll
+Registered in 0.001130 seconds.
+- Loaded All Assemblies, in  0.296 seconds
+Native extension for OSXStandalone target not found
+Native extension for WebGL target not found
+ScheduleIndexationOnStartup MainProcess:False IndexOnStartup:True
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.254 seconds
+Domain Reload Profiling: 550ms
+	BeginReloadAssembly (119ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (0ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (0ms)
+	RebuildCommonClasses (25ms)
+	RebuildNativeTypeToScriptingClass (7ms)
+	initialDomainReloadingComplete (25ms)
+	LoadAllAssembliesAndSetupDomain (119ms)
+		LoadAssemblies (119ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (116ms)
+			TypeCache.Refresh (115ms)
+				TypeCache.ScanAssembly (105ms)
+			BuildScriptInfoCaches (0ms)
+			ResolveRequiredComponents (0ms)
+	FinalizeReload (254ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (225ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (27ms)
+			SetLoadedEditorAssemblies (3ms)
+			BeforeProcessingInitializeOnLoad (56ms)
+			ProcessInitializeOnLoadAttributes (91ms)
+			ProcessInitializeOnLoadMethodAttributes (49ms)
+			AfterProcessingInitializeOnLoad (0ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (0ms)
+Assembly reference Packages/com.unity.cinemachine/Editor/Samples/ExposeHDRPInternals/HDRP-Editor-ref.asmref has no target assembly definition
+[CoreBusinessMetrics] Unexpected thread when updating session info.
+========================================================================
+Worker process is ready to serve import requests
+Import Worker Mode flag is 0x00
+Assembly reference Packages/com.unity.cinemachine/Editor/Samples/ExposeHDRPInternals/HDRP-Editor-ref.asmref has no target assembly definition
+Assembly reference Packages/com.unity.cinemachine/Editor/Samples/ExposeHDRPInternals/HDRP-Editor-ref.asmref has no target assembly definition
+Begin MonoManager ReloadAssembly
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] License group:
+  Id: 17867598778462-UnityPersXXXX
+  Product: Unity Personal
+  Type: Assigned
+  Expiration: Unlimited
+- Loaded All Assemblies, in  0.451 seconds
+Assembly reference Packages/com.unity.cinemachine/Editor/Samples/ExposeHDRPInternals/HDRP-Editor-ref.asmref has no target assembly definition
+'Packages/com.unity.cinemachine/Editor/Obsolete/CinemachineVirtualCameraBaseEditor.cs' contains partial class of Unity.Object, exactly 1 of the partial classes needs to be in a file with the same filename. This is to know the one that can be referenced from ie. GameObjects
+'Packages/com.unity.cinemachine/Editor/Editors/CinemachineVirtualCameraBaseEditor.cs' contains partial class of Unity.Object, exactly 1 of the partial classes needs to be in a file with the same filename. This is to know the one that can be referenced from ie. GameObjects
+Refreshing native plugins compatible for Editor in 0.17 ms, found 1 plugins.
+Native extension for OSXStandalone target not found
+Native extension for WebGL target not found
+Assembly reference Packages/com.unity.cinemachine/Editor/Samples/ExposeHDRPInternals/HDRP-Editor-ref.asmref has no target assembly definition
+Package Manager log level set to [2]
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+ScheduleIndexationOnStartup MainProcess:False IndexOnStartup:True
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.428 seconds
+Domain Reload Profiling: 880ms
+	BeginReloadAssembly (88ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (3ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (32ms)
+	RebuildCommonClasses (24ms)
+	RebuildNativeTypeToScriptingClass (8ms)
+	initialDomainReloadingComplete (18ms)
+	LoadAllAssembliesAndSetupDomain (313ms)
+		LoadAssemblies (194ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (149ms)
+			TypeCache.Refresh (112ms)
+				TypeCache.ScanAssembly (100ms)
+			BuildScriptInfoCaches (28ms)
+			ResolveRequiredComponents (7ms)
+	FinalizeReload (429ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (313ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (1ms)
+			SetLoadedEditorAssemblies (3ms)
+			BeforeProcessingInitializeOnLoad (78ms)
+			ProcessInitializeOnLoadAttributes (198ms)
+			ProcessInitializeOnLoadMethodAttributes (32ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (2ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Launching external process: /Applications/Unity/Hub/Editor/6000.3.5f2/Unity.app/Contents/Helpers/UnityShaderCompiler
+Launched and connected shader compiler UnityShaderCompiler after 0.02 seconds
+Refreshing native plugins compatible for Editor in 0.22 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 18 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6613 unused Assets / (3.0 MB). Loaded Objects now: 7411.
+Memory consumption went from 150.9 MB to 147.8 MB.
+Total: 5.690708 ms (FindLiveObjects: 0.411000 ms CreateObjectMapping: 0.134750 ms MarkObjects: 3.967875 ms  DeleteObjects: 1.176875 ms)
+
+========================================================================
+Received Import Request.
+  Time since last request: 232273.618474 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '998ce88a9c74e462e207f099856a4652') in 0.252510166 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 118
+
+========================================================================
+Received Import Request.
+  Time since last request: 4.963898 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'c184c838e5a4acd3d0b9160f5cdbaba3') in 0.009268584 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 126
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.968240 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '472b5572dad875eec78d0d8327cdcada') in 0.028557458 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 77
+
+========================================================================
+Received Import Request.
+  Time since last request: 9.267489 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '84df242a9c0c5140a93d8641b8a746a9') in 0.009201333 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 126
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.928503 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '4acbc4c960f5a33c35f922d38bd7c73c') in 0.002063458 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 77
+
+========================================================================
+Received Import Request.
+  Time since last request: 2.838103 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '9b836917bd928948939f25cdd963bc76') in 0.009827083 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 134
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.965420 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'daa5525dbd9fc4fed3c81fd38490cb25') in 0.002107875 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 84
+
+========================================================================
+Received Import Request.
+  Time since last request: 21.495680 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '39ff5e53e46d54721b6f44e4ae9d3061') in 0.014691459 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 134
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.911372 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '814cc532f7d517b6bb6d86e6c76457bd') in 0.002640333 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 84
+
+========================================================================
+Received Import Request.
+  Time since last request: 5.882212 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'b5c9fbaf2a8775b761a7f94dc237a906') in 0.012527166 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 134
+
+========================================================================
+Received Import Request.
+  Time since last request: 3.382673 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'a20ebf148fbf1dcaf357624951a7d9b1') in 0.002171625 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 84
+
+========================================================================
+Received Import Request.
+  Time since last request: 9.119272 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '59957a20605494c3e7f27c402f611d48') in 0.009814708 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 134
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.971462 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '0d0b35fd498a59faf52a595bac492836') in 0.002470959 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 84
+
+========================================================================
+Received Import Request.
+  Time since last request: 10.333445 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '057fe4f16b8d2dfd82d6fe830bd938fd') in 0.011404292 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 134
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.917764 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'b8ef173e8f2c9b6fa71363edfde01b4d') in 0.002202458 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 84
+
+========================================================================
+Received Import Request.
+  Time since last request: 3.449114 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'c8001df641d30c846a8000e194d231a9') in 0.012085584 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 142
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.963717 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '451e70dd2d386c0cba676fd95dba6ad3') in 0.002132417 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 91
+
+========================================================================
+Received Import Request.
+  Time since last request: 1.013414 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '50efbcb8b8eea8a41f38518f82be307f') in 0.008594167 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 142
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.969874 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'f1eefadb2ef0b3532424dd4906d375a4') in 0.002130792 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 91
+
+========================================================================
+Received Prepare
+Assembly reference Packages/com.unity.cinemachine/Editor/Samples/ExposeHDRPInternals/HDRP-Editor-ref.asmref has no target assembly definition
+Assembly reference Packages/com.unity.cinemachine/Editor/Samples/ExposeHDRPInternals/HDRP-Editor-ref.asmref has no target assembly definition
+Begin MonoManager ReloadAssembly
+[Licensing::Client] Successfully resolved entitlement details
+Thread 0x34198f000 may have been prematurely finalized
+- Loaded All Assemblies, in  0.432 seconds
+Assembly reference Packages/com.unity.cinemachine/Editor/Samples/ExposeHDRPInternals/HDRP-Editor-ref.asmref has no target assembly definition
+'Packages/com.unity.cinemachine/Editor/Obsolete/CinemachineVirtualCameraBaseEditor.cs' contains partial class of Unity.Object, exactly 1 of the partial classes needs to be in a file with the same filename. This is to know the one that can be referenced from ie. GameObjects
+'Packages/com.unity.cinemachine/Editor/Editors/CinemachineVirtualCameraBaseEditor.cs' contains partial class of Unity.Object, exactly 1 of the partial classes needs to be in a file with the same filename. This is to know the one that can be referenced from ie. GameObjects
+Refreshing native plugins compatible for Editor in 0.17 ms, found 1 plugins.
+Native extension for OSXStandalone target not found
+Native extension for WebGL target not found
+Assembly reference Packages/com.unity.cinemachine/Editor/Samples/ExposeHDRPInternals/HDRP-Editor-ref.asmref has no target assembly definition
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+ScheduleIndexationOnStartup MainProcess:False IndexOnStartup:True
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.421 seconds
+Domain Reload Profiling: 855ms
+	BeginReloadAssembly (152ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (15ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (66ms)
+	RebuildCommonClasses (23ms)
+	RebuildNativeTypeToScriptingClass (7ms)
+	initialDomainReloadingComplete (25ms)
+	LoadAllAssembliesAndSetupDomain (226ms)
+		LoadAssemblies (149ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (107ms)
+			TypeCache.Refresh (8ms)
+				TypeCache.ScanAssembly (0ms)
+			BuildScriptInfoCaches (90ms)
+			ResolveRequiredComponents (6ms)
+	FinalizeReload (421ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (331ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (1ms)
+			SetLoadedEditorAssemblies (3ms)
+			BeforeProcessingInitializeOnLoad (83ms)
+			ProcessInitializeOnLoadAttributes (206ms)
+			ProcessInitializeOnLoadMethodAttributes (36ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (7ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.23 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 18 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6612 unused Assets / (3.1 MB). Loaded Objects now: 7459.
+Memory consumption went from 171.0 MB to 167.9 MB.
+Total: 6.421833 ms (FindLiveObjects: 0.354334 ms CreateObjectMapping: 0.138500 ms MarkObjects: 4.678334 ms  DeleteObjects: 1.250333 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Import Request.
+  Time since last request: 56.760910 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'b0d46a1ed1d347a68d07d502f8e6291a') in 0.242321583 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 150
+
+========================================================================
+Received Import Request.
+  Time since last request: 5.740369 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'd3e3ccc43194bba9a7ff5a2e078e5f41') in 0.008809791 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 150
+
+========================================================================
+Received Import Request.
+  Time since last request: 2.807136 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '553fcf6e01b279d56185a23e104b62ef') in 0.009096458 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 150
+
+========================================================================
+Received Import Request.
+  Time since last request: 13.149830 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'a4ec50c17dfc388e18dc1586e8659ee1') in 0.009827334 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 158
+
+========================================================================
+Received Import Request.
+  Time since last request: 2.555505 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'c6b6babab6d0f4d8d3daf5ef69e6a276') in 0.008432958 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 158
+
+========================================================================
+Received Import Request.
+  Time since last request: 2.412744 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '96727d99ba94f7d8bd5e5aab80c42acb') in 0.009989916 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 166
+
+========================================================================
+Received Import Request.
+  Time since last request: 7.266865 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '9679627daf958763dab6c18c278cd0a5') in 0.009316792 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 166
+
+========================================================================
+Received Import Request.
+  Time since last request: 2.812090 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'a9c5e482236962bffd744997f1535435') in 0.009706833 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 174
+
+========================================================================
+Received Import Request.
+  Time since last request: 5.657600 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '3480970a6d517e1763b2cbe63c0efd4f') in 0.011687208 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 174
+
+========================================================================
+Received Import Request.
+  Time since last request: 1.992638 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '61f6b8484fb98fde40f97ca7cfc5233b') in 0.008906416 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 182
+
+========================================================================
+Received Import Request.
+  Time since last request: 3.224780 seconds.
+  path: Assets/Street.prefab
+  artifactKey: Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Street.prefab using Guid(4f4701387f7b04173ad2af157861ad19) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '48d424e801806311c8e0918b0f19a1e8') in 0.010765625 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 182
+
