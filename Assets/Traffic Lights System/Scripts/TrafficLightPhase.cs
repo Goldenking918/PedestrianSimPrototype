@@ -35,9 +35,13 @@ namespace HealthbarGames
         public float PhaseActiveTime = 10.0f;
         // duration of yellow light (time between 'Go' and 'Stop' states)
         public float PhaseEndTime = 2.0f;
+        
+        public bool ForceStopOnly = false;
 
         // list of attached traffic lights (all this lights will be always in the same state as this phase)
         public TrafficLightBase[] TrafficLights;
+        // if true this phase will force all its lights to STOP (red) regardless of the state requested
+        [UnityEngine.SerializeField]
 
         // current state of this phase
         private TrafficLightBase.State mState = TrafficLightBase.State.Blank;
@@ -55,6 +59,14 @@ namespace HealthbarGames
         // sets current state of this phase (and all attached traffic lights)
         public void SetState(TrafficLightBase.State state)
         {
+            // if this phase is configured as All-Red, always force Stop
+            if (ForceStopOnly)
+            {
+                mState = TrafficLightBase.State.Stop;
+                ChangeLightState(true, false, false);
+                return;
+            }
+
             //if (mState == state)
             //    return;
 

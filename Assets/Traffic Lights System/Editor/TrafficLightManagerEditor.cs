@@ -142,12 +142,17 @@ namespace HealthbarGames
                     SerializedProperty phaseActiveTime = phase.FindPropertyRelative("PhaseActiveTime");
                     SerializedProperty phaseEndTime = phase.FindPropertyRelative("PhaseEndTime");
                     SerializedProperty lightsList = phase.FindPropertyRelative("TrafficLights");
+                    SerializedProperty forceStopOnly = phase.FindPropertyRelative("ForceStopOnly");
 
                     phaseStartTime.floatValue = EditorGUILayout.Slider("Start time", phaseStartTime.floatValue, 0.0f, 10.0f);
                     phaseActiveTime.floatValue = EditorGUILayout.Slider("Phase time", phaseActiveTime.floatValue, 1.0f, 300.0f);
                     phaseEndTime.floatValue = EditorGUILayout.Slider("End time", phaseEndTime.floatValue, 0.0f, 10.0f);
 
                     EditorGUILayout.PropertyField(lightsList, true);
+                    if (forceStopOnly != null)
+                    {
+                        EditorGUILayout.PropertyField(forceStopOnly, new GUIContent("Force Stop Only", "If true this phase will force all its lights to STOP (red) regardless of the requested state"));
+                    }
                 }
                 else
                 {
@@ -195,6 +200,10 @@ namespace HealthbarGames
             element.FindPropertyRelative("PhaseActiveTime").floatValue = mDefaultActiveTime.floatValue;
             element.FindPropertyRelative("PhaseEndTime").floatValue = mDefaultEndTime.floatValue;
             element.FindPropertyRelative("TrafficLights").arraySize = 0;
+            // ensure new phases have ForceStopOnly default
+            var forceProp = element.FindPropertyRelative("ForceStopOnly");
+            if (forceProp != null)
+                forceProp.boolValue = false;
         }
 
 
