@@ -39,6 +39,14 @@ public class CarMovement : MonoBehaviour
         Ray ray = new Ray(probeOrigin, transform.forward);
         if (Physics.Raycast(ray, out RaycastHit hit, lookaheadDistance))
         {
+            var player = hit.collider.GetComponentInParent<PlayerMovement>();
+            if (player != null)
+            {
+                currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, deceleration * Time.deltaTime);
+                MoveTowards(currentSpeed);
+                return;
+            }
+
             var ahead = hit.collider.GetComponentInParent<CarMovement>();
             if (ahead != null && ahead != this)
             {
