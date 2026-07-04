@@ -940,9 +940,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86bef71eae13f4341a9698c03349ee23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  carPrefabs:
-  - {fileID: 8252865144733056475, guid: e0d08241a47f44b57b8d32b3d3851c02, type: 3}
-  - {fileID: 6627719025246014540, guid: 87ac5ce1df2a64407bd9d0137b2d68b5, type: 3}
+  carPrefab: {fileID: 8252865144733056475, guid: e0d08241a47f44b57b8d32b3d3851c02, type: 3}
   waypoints:
   - {fileID: 303733913}
   - {fileID: 703253357}
@@ -4818,9 +4816,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86bef71eae13f4341a9698c03349ee23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  carPrefabs:
-  - {fileID: 8252865144733056475, guid: e0d08241a47f44b57b8d32b3d3851c02, type: 3}
-  - {fileID: 6627719025246014540, guid: 87ac5ce1df2a64407bd9d0137b2d68b5, type: 3}
+  carPrefab: {fileID: 8252865144733056475, guid: e0d08241a47f44b57b8d32b3d3851c02, type: 3}
   waypoints:
   - {fileID: 940605428}
   - {fileID: 2122212129}
@@ -8332,9 +8328,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86bef71eae13f4341a9698c03349ee23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  carPrefabs:
-  - {fileID: 8252865144733056475, guid: e0d08241a47f44b57b8d32b3d3851c02, type: 3}
-  - {fileID: 6627719025246014540, guid: 87ac5ce1df2a64407bd9d0137b2d68b5, type: 3}
+  carPrefab: {fileID: 8252865144733056475, guid: e0d08241a47f44b57b8d32b3d3851c02, type: 3}
   waypoints:
   - {fileID: 98227584}
   - {fileID: 145805355}
@@ -11357,9 +11351,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86bef71eae13f4341a9698c03349ee23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  carPrefabs:
-  - {fileID: 8252865144733056475, guid: e0d08241a47f44b57b8d32b3d3851c02, type: 3}
-  - {fileID: 6627719025246014540, guid: 87ac5ce1df2a64407bd9d0137b2d68b5, type: 3}
+  carPrefab: {fileID: 8252865144733056475, guid: e0d08241a47f44b57b8d32b3d3851c02, type: 3}
   waypoints:
   - {fileID: 194726362}
   - {fileID: 1499360825}

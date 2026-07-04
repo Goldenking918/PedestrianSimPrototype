@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4734689996541925446}
   - component: {fileID: 4867935066253149541}
   - component: {fileID: -1874279843422406470}
+  - component: {fileID: 6582306224641224874}
   m_Layer: 0
   m_Name: car-1-1_Prefab
   m_TagString: Untagged
@@ -48,6 +49,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CarMovement
   waypoints: []
   speed: 10
+  acceleration: 6
+  deceleration: 8
+  detectionDistance: 3
+  frontProbeOffset: 1.5
+  stopDistance: 1
+  minFollowingSpeed: 0
 --- !u!54 &-1874279843422406470
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -75,6 +82,26 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &6582306224641224874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8252865144733056475}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e842ce069aa2147aeeea9c99e5c1d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WheelSpin
+  wheels:
+  - {fileID: 1410944304127395669}
+  - {fileID: 6652457776723067576}
+  - {fileID: 1175742784788320134}
+  - {fileID: 6121433281251963063}
+  wheelRadius: 0.33
+  spinAxis: {x: 0, y: 0, z: 1}
+  reverseSpinDirection: 0
 --- !u!1001 &7684525769587846433
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -219,6 +246,16 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 5061116193302474698}
   m_SourcePrefab: {fileID: 100100000, guid: e209905686ddd491794010203d6553b6, type: 3}
+--- !u!4 &1175742784788320134 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8860261260631417511, guid: e209905686ddd491794010203d6553b6, type: 3}
+  m_PrefabInstance: {fileID: 7684525769587846433}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1410944304127395669 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -490816323853374860, guid: e209905686ddd491794010203d6553b6, type: 3}
+  m_PrefabInstance: {fileID: 7684525769587846433}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &3148001227335465712 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -4536504613602551855, guid: e209905686ddd491794010203d6553b6, type: 3}
@@ -245,6 +282,16 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.6029712, y: 0.4803648, z: 0.6755626}
   m_Center: {x: -0.20462957, y: 0.071308285, z: -0.0004540683}
+--- !u!4 &6121433281251963063 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4492156305197800854, guid: e209905686ddd491794010203d6553b6, type: 3}
+  m_PrefabInstance: {fileID: 7684525769587846433}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6652457776723067576 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3960542463843856281, guid: e209905686ddd491794010203d6553b6, type: 3}
+  m_PrefabInstance: {fileID: 7684525769587846433}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7867315777892977354 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e209905686ddd491794010203d6553b6, type: 3}

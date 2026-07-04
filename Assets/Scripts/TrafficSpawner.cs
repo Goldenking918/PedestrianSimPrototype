@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class TrafficSpawner : MonoBehaviour
 {
-    public GameObject carPrefab;
+    [Tooltip("Car prefabs that can be randomly spawned")]
+    public GameObject[] carPrefabs;
     public Transform[] waypoints;
 
     public float spawnInterval = 3f;
@@ -40,6 +41,11 @@ public class TrafficSpawner : MonoBehaviour
 
     void SpawnCar()
     {
+        if (carPrefabs == null || carPrefabs.Length == 0)
+        {
+            return;
+        }
+
         // check for existing cars near spawn point
         Collider[] hits = Physics.OverlapSphere(transform.position, spawnClearRadius);
         foreach (var c in hits)
@@ -49,6 +55,12 @@ public class TrafficSpawner : MonoBehaviour
                 // skip spawn this time
                 return;
             }
+        }
+
+        GameObject carPrefab = carPrefabs[Random.Range(0, carPrefabs.Length)];
+        if (carPrefab == null)
+        {
+            return;
         }
 
         GameObject car = Instantiate(carPrefab, transform.position, transform.rotation);
