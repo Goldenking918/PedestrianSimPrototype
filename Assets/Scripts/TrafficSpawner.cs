@@ -5,6 +5,11 @@ public class TrafficSpawner : MonoBehaviour
     [Tooltip("Car prefabs that can be randomly spawned")]
     public GameObject[] carPrefabs;
     public Transform[] waypoints;
+    [Tooltip("Optional waypoint path for turning cars")]
+    public Transform[] alternateWaypoints;
+    [Range(0f, 1f)]
+    [Tooltip("Chance that a spawned car uses the alternate path")]
+    public float alternatePathChance = 0.25f;
 
     public float spawnInterval = 3f;
     [Tooltip("Minimum radius around spawner that must be clear to spawn a new car")]
@@ -67,10 +72,23 @@ public class TrafficSpawner : MonoBehaviour
         var cm = car.GetComponent<CarMovement>();
         if (cm != null)
         {
-            cm.waypoints = waypoints;
+            cm.waypoints = SelectWaypoints();
             // assign randomized speed
             if (spawnCarMaxSpeed > spawnCarMinSpeed)
                 cm.speed = Random.Range(spawnCarMinSpeed, spawnCarMaxSpeed);
         }
+    }
+
+    private Transform[] SelectWaypoints()
+    {
+        bool canUseAlternate = alternateWaypoints != null && alternateWaypoints.Length > 0;
+        bool useAlternate = canUseAlternate && Random.value < alternatePathChance;
+
+        if (useAlternate)
+        {
+            return alternateWaypoints;
+        }
+
+        return waypoints;
     }
 }

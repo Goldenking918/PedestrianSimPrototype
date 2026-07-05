@@ -7,6 +7,8 @@ namespace HealthbarGames
     {
         [Tooltip("Traffic light module that controls this stop line")]
         public TrafficLightBase TrafficLightModule;
+        [Tooltip("Only allow movement when the controlling phase name matches one of these values. Leave empty to allow any phase.")]
+        public string[] AllowedPhaseNames;
 
         void Reset()
         {
@@ -49,7 +51,7 @@ namespace HealthbarGames
                 return;
 
             var state = TrafficLightModule.GetState();
-            bool shouldStop = (state != TrafficLightBase.State.Go);
+            bool shouldStop = (state != TrafficLightBase.State.Go) || !IsAllowedPhase(TrafficLightModule.GetPhaseName());
 
             var nav = other.GetComponentInParent<UnityEngine.AI.NavMeshAgent>();
             if (nav != null)
@@ -72,6 +74,26 @@ namespace HealthbarGames
                 cm.SetStopped(shouldStop);
                 return;
             }
+        }
+
+        private bool IsAllowedPhase(string phaseName)
+        {
+            if (AllowedPhaseNames == null || AllowedPhaseNames.Length == 0)
+                return true;
+
+            if (string.IsNullOrEmpty(phaseName))
+                return false;
+
+            for (int i = 0; i < AllowedPhaseNames.Length; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(AllowedPhaseNames[i]) &&
+                    string.Equals(AllowedPhaseNames[i].Trim(), phaseName.Trim(), System.StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

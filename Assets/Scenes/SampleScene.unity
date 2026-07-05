@@ -948,6 +948,8 @@ MonoBehaviour:
   waypoints:
   - {fileID: 303733913}
   - {fileID: 703253357}
+  alternateWaypoints: []
+  alternatePathChance: 0.25
   spawnInterval: 2.95
   spawnClearRadius: 2
   spawnIntervalMin: 1
@@ -2608,6 +2610,37 @@ PrefabInstance:
       addedObject: {fileID: 1210832175}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4f4701387f7b04173ad2af157861ad19, type: 3}
+--- !u!1 &262710986
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 262710987}
+  m_Layer: 0
+  m_Name: PointTurn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &262710987
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 262710986}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.81, y: 0, z: -12.25}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1041161681}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &271340529
 GameObject:
   m_ObjectHideFlags: 0
@@ -3190,6 +3223,37 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 104620, guid: 856747ac5e7d8ae419bebaab7dec1ee7, type: 3}
   m_PrefabInstance: {fileID: 1563994364}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &335258618
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 335258619}
+  m_Layer: 0
+  m_Name: PointTurn (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &335258619
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 335258618}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.81, y: 0, z: -5.4}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1041161681}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &349829984
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4828,6 +4892,12 @@ MonoBehaviour:
   waypoints:
   - {fileID: 940605428}
   - {fileID: 2122212129}
+  alternateWaypoints:
+  - {fileID: 940605428}
+  - {fileID: 1824560909}
+  - {fileID: 335258619}
+  - {fileID: 262710987}
+  alternatePathChance: 1
   spawnInterval: 2.95
   spawnClearRadius: 2
   spawnIntervalMin: 1
@@ -5397,6 +5467,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthbarGames.StopLine
   TrafficLightModule: {fileID: 2138897185}
+  AllowedPhaseNames:
+  - SideA
 --- !u!65 &764489099
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5470,7 +5542,7 @@ MonoBehaviour:
   PhaseList:
   - Name: SideA
     PhaseStartTime: 2
-    PhaseActiveTime: 10
+    PhaseActiveTime: 5
     PhaseEndTime: 2
     ForceStopOnly: 0
     TrafficLights:
@@ -5479,7 +5551,7 @@ MonoBehaviour:
     mState: 0
   - Name: AllRed
     PhaseStartTime: 2
-    PhaseActiveTime: 10
+    PhaseActiveTime: 5
     PhaseEndTime: 2
     ForceStopOnly: 1
     TrafficLights:
@@ -5490,12 +5562,20 @@ MonoBehaviour:
     mState: 0
   - Name: SideB
     PhaseStartTime: 2
-    PhaseActiveTime: 10
+    PhaseActiveTime: 5
     PhaseEndTime: 2
     ForceStopOnly: 0
     TrafficLights:
     - {fileID: 1382373543}
     - {fileID: 181746437}
+    mState: 0
+  - Name: AllGreen
+    PhaseStartTime: 2
+    PhaseActiveTime: 10
+    PhaseEndTime: 2
+    ForceStopOnly: 0
+    TrafficLights:
+    - {fileID: 482160285}
     mState: 0
   InitialProgram: 1
 --- !u!4 &764955548
@@ -6382,6 +6462,7 @@ Transform:
   m_Children:
   - {fileID: 303733913}
   - {fileID: 703253357}
+  - {fileID: 1432534436}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &927954834
@@ -7450,6 +7531,9 @@ Transform:
   m_Children:
   - {fileID: 940605428}
   - {fileID: 2122212129}
+  - {fileID: 262710987}
+  - {fileID: 1824560909}
+  - {fileID: 335258619}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1001 &1050247335
@@ -8271,6 +8355,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthbarGames.StopLine
   TrafficLightModule: {fileID: 1382373543}
+  AllowedPhaseNames:
+  - SideB
 --- !u!65 &1183753250
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8344,6 +8430,8 @@ MonoBehaviour:
   waypoints:
   - {fileID: 98227584}
   - {fileID: 145805355}
+  alternateWaypoints: []
+  alternatePathChance: 0.25
   spawnInterval: 2.95
   spawnClearRadius: 2
   spawnIntervalMin: 1
@@ -9732,6 +9820,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1415285710}
   m_Mesh: {fileID: 4300000, guid: 631028b3a30f092428e370d8a925482c, type: 3}
+--- !u!1 &1432534435
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1432534436}
+  m_Layer: 0
+  m_Name: PointTurn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1432534436
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1432534435}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 71.77, y: 0, z: 18.72}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 910362168}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1444325626
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11371,6 +11490,8 @@ MonoBehaviour:
   waypoints:
   - {fileID: 194726362}
   - {fileID: 1499360825}
+  alternateWaypoints: []
+  alternatePathChance: 0.25
   spawnInterval: 2.95
   spawnClearRadius: 2
   spawnIntervalMin: 1
@@ -12046,6 +12167,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1823031370}
   m_Mesh: {fileID: 4300000, guid: 631028b3a30f092428e370d8a925482c, type: 3}
+--- !u!1 &1824560908
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1824560909}
+  m_Layer: 0
+  m_Name: PointTurn (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1824560909
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1824560908}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 2.45, y: 0, z: -0.45}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1041161681}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1833942152
 PrefabInstance:
   m_ObjectHideFlags: 0

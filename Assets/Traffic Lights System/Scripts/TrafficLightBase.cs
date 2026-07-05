@@ -49,5 +49,13 @@ namespace HealthbarGames
             else
                 return TrafficLightBase.State.Blank;
         }
+
+        public string GetPhaseName()
+        {
+            if (mParentPhase != null)
+                return mParentPhase.Name;
+
+            return string.Empty;
+        }
     }
 }
