@@ -72,23 +72,12 @@ public class TrafficSpawner : MonoBehaviour
         var cm = car.GetComponent<CarMovement>();
         if (cm != null)
         {
-            cm.waypoints = SelectWaypoints();
+            bool useAlternate = alternateWaypoints != null && alternateWaypoints.Length > 0 && Random.value < alternatePathChance;
+            cm.waypoints = useAlternate ? alternateWaypoints : waypoints;
+            cm.SetAlternateRoute(useAlternate);
             // assign randomized speed
             if (spawnCarMaxSpeed > spawnCarMinSpeed)
                 cm.speed = Random.Range(spawnCarMinSpeed, spawnCarMaxSpeed);
         }
-    }
-
-    private Transform[] SelectWaypoints()
-    {
-        bool canUseAlternate = alternateWaypoints != null && alternateWaypoints.Length > 0;
-        bool useAlternate = canUseAlternate && Random.value < alternatePathChance;
-
-        if (useAlternate)
-        {
-            return alternateWaypoints;
-        }
-
-        return waypoints;
     }
 }

@@ -3,6 +3,7 @@ using UnityEngine;
 public class CarMovement : MonoBehaviour
 {
     public Transform[] waypoints;
+    public bool IsAlternateRoute { get; private set; }
     public float speed = 10f;
     [Tooltip("How quickly the car can accelerate back up to cruising speed (m/s^2)")]
     public float acceleration = 6f;
@@ -24,6 +25,11 @@ public class CarMovement : MonoBehaviour
     void Start()
     {
         currentSpeed = speed;
+    }
+
+    public void SetAlternateRoute(bool isAlternateRoute)
+    {
+        IsAlternateRoute = isAlternateRoute;
     }
 
     void Update()
