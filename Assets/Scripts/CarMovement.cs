@@ -15,6 +15,8 @@ public class CarMovement : MonoBehaviour
     public float frontProbeOffset = 1.5f;
     [Tooltip("Distance at which vehicle will fully stop behind another vehicle")]
     public float stopDistance = 1.0f;
+    [Tooltip("Minimum gap to leave between cars so a person can fit through")]
+    public float minimumStopGap = 2.0f;
     [Tooltip("Minimum speed when following another vehicle (m/s)")]
     public float minFollowingSpeed = 0f;
 
@@ -38,7 +40,8 @@ public class CarMovement : MonoBehaviour
             return;
 
         // simple forward obstacle check to avoid overlapping other cars
-        float brakingDistance = stopDistance + (currentSpeed * currentSpeed) / (2f * Mathf.Max(deceleration, 0.01f)) + 0.5f;
+        float effectiveStopGap = Mathf.Max(stopDistance, minimumStopGap);
+        float brakingDistance = effectiveStopGap + (currentSpeed * currentSpeed) / (2f * Mathf.Max(deceleration, 0.01f)) + 0.5f;
         float lookaheadDistance = Mathf.Max(detectionDistance, brakingDistance);
 
         Vector3 probeOrigin = transform.position + Vector3.up * 0.5f + transform.forward * frontProbeOffset;
@@ -56,7 +59,7 @@ public class CarMovement : MonoBehaviour
             var ahead = hit.collider.GetComponentInParent<CarMovement>();
             if (ahead != null && ahead != this)
             {
-            float gap = Vector3.Distance(probeOrigin, hit.point) - stopDistance;
+            float gap = Vector3.Distance(probeOrigin, hit.point) - effectiveStopGap;
                 float safeSpeed = gap <= 0f ? 0f : Mathf.Sqrt(2f * deceleration * gap);
                 safeSpeed = Mathf.Clamp(safeSpeed, minFollowingSpeed, speed);
 
