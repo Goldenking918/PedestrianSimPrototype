@@ -1,2 +1,12 @@
 fileFormatVersion: 2
 guid: bca9aa7bc1cfa6f4eac1c35df345b9e9
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - HonkClip: {fileID: 8300000, guid: f02b1abf8febf974d92303e7ce28e37e, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
