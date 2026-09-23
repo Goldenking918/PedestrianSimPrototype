@@ -27,6 +27,7 @@ public class TrafficController : MonoBehaviour
     [Header("Rigidbody vehicles")]
     [Min(0f)] public float vehicleMaxSpeed = 5f;
     [Min(0f)] public float vehicleReachThreshold = 0.5f;
+    public TrafficSpawner[] trafficSpawners;
 
     private void Awake()
     {
@@ -79,5 +80,30 @@ public class TrafficController : MonoBehaviour
     public static TrafficController FindController()
     {
         return Instance != null ? Instance : FindFirstObjectByType<TrafficController>();
+    }
+    public void ApplyToAllSpawners()
+    {
+        foreach (TrafficSpawner spawner in trafficSpawners)
+        {
+            ApplyTo(spawner);
+        }
+
+    }
+    public void StartAllSpawners()
+    {
+        foreach (TrafficSpawner spawner in trafficSpawners)
+    {
+        if (spawner != null)
+            spawner.StartSpawning();
+    }
+    }
+
+    public void StopAllSpawners()
+    {
+        foreach (TrafficSpawner spawner in trafficSpawners)
+        {
+            if (spawner != null)
+                spawner.StopSpawning();
+        }
     }
 }

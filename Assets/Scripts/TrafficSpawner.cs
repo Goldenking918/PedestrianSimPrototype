@@ -25,13 +25,13 @@ public class TrafficSpawner : MonoBehaviour
     [Tooltip("Maximum random speed assigned to spawned cars")]
     public float spawnCarMaxSpeed = 12f;
 
+    private Coroutine spawnCoroutine;
+
     void Start()
     {
         TrafficController controller = TrafficController.FindController();
         if (controller != null)
             controller.ApplyTo(this);
-
-        StartCoroutine(SpawnLoop());
     }
 
     private System.Collections.IEnumerator SpawnLoop()
@@ -89,4 +89,21 @@ public class TrafficSpawner : MonoBehaviour
                 cm.speed = Random.Range(spawnCarMinSpeed, spawnCarMaxSpeed);
         }
     }
+
+    public void StartSpawning()
+{
+    if (spawnCoroutine == null)
+    {
+        spawnCoroutine = StartCoroutine(SpawnLoop());
+    }
+}
+
+public void StopSpawning()
+{
+    if (spawnCoroutine != null)
+    {
+        StopCoroutine(spawnCoroutine);
+        spawnCoroutine = null;
+    }
+}
 }

@@ -4,12 +4,12 @@ using System.IO;
 public class ScenarioManager : MonoBehaviour
 {
     public ScenarioConfig currentScenario;
+    public TrafficController trafficController;
 
     void Start()
     {
-        LoadScenario("HighTraffic.json");
+        StartScenario("HighTraffic.json");
 
-        Debug.Log("Speed: " + currentScenario.carSpeedMin);
     }
 
     public void LoadScenario(string fileName)
@@ -29,5 +29,42 @@ public class ScenarioManager : MonoBehaviour
     public ScenarioConfig GetScenario()
     {
         return currentScenario;
+    }
+
+    public void StartScenario(string fileName)
+    {
+        LoadScenario(fileName);
+
+        ApplyScenario();
+        
+        trafficController.ApplyToAllSpawners();
+
+        trafficController.StartAllSpawners();
+    }
+    private void ApplyScenario()
+    {
+        trafficController.carSpeed =
+            currentScenario.carSpeed;
+
+        trafficController.carAcceleration =
+            currentScenario.carAcceleration;
+
+        trafficController.carDeceleration =
+            currentScenario.carDeceleration;
+
+        trafficController.spawnIntervalMin =
+            currentScenario.spawnIntervalMin;
+
+        trafficController.spawnIntervalMax =
+            currentScenario.spawnIntervalMax;
+
+        trafficController.spawnCarMinSpeed =
+            currentScenario.spawnCarMinSpeed;
+
+        trafficController.spawnCarMaxSpeed =
+            currentScenario.spawnCarMaxSpeed;
+
+        trafficController.alternatePathChance =
+            currentScenario.alternatePathChance;
     }
 }

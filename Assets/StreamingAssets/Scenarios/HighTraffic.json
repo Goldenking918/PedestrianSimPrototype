@@ -1,8 +1,17 @@
 {
     "scenarioName": "High Traffic",
+
+    "carSpeed": 10.0,
     "spawnIntervalMin": 1.0,
-    "spawnIntervalMax": 3.0,
-    "carSpeedMin": 8.0,
-    "carSpeedMax": 12.0,
-    "alternatePathChance": 0.30
+    "spawnIntervalMax": 2.5,
+
+    "spawnCarMinSpeed": 8.0,
+    "spawnCarMaxSpeed": 12.0,
+
+    "alternatePathChance": 0.4,
+
+    "carAcceleration": 6.0,
+    "carDeceleration": 8.0,
+
+    "trafficLightsEnabled": true
 }
