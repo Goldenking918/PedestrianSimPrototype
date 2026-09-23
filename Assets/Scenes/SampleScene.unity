@@ -9632,13 +9632,13 @@ Transform:
   m_GameObject: {fileID: 955870643}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.2624301, z: -0, w: 0.96495104}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.4285713, y: 1.4285713, z: 1.4285713}
+  m_LocalPosition: {x: 38.01, y: 0.62, z: -8.05}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1316282250}
   - {fileID: 369965815}
-  m_Father: {fileID: 1316671049}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &955870645
 MonoBehaviour:
@@ -13287,8 +13287,7 @@ Transform:
   m_LocalPosition: {x: 38.01, y: 0.62, z: -8.05}
   m_LocalScale: {x: 0.70000005, y: 0.7, z: 0.70000005}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 955870644}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &1316671050
@@ -13332,7 +13331,7 @@ MonoBehaviour:
   speed: 12
   gravity: -9.81
   jumpHeight: 3
-  vrCamera: {fileID: 369965815}
+  vrCamera: {fileID: 153835501}
 --- !u!4 &1320031865 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 289090962349181711, guid: 4f4701387f7b04173ad2af157861ad19, type: 3}
@@ -17736,6 +17735,67 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4255878897615592, guid: 6c59ef0028580ac429571adf93ff0a16, type: 3}
   m_PrefabInstance: {fileID: 449513186}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1858014958
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1858014960}
+  - component: {fileID: 1858014959}
+  m_Layer: 0
+  m_Name: TrafficController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1858014959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1858014958}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eabea1690008f704db226973728a7851, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TrafficController
+  carSpeed: 20
+  carAcceleration: 6
+  carDeceleration: 8
+  carDetectionDistance: 3
+  carFrontProbeOffset: 1.5
+  carStopDistance: 1
+  carMinimumStopGap: 2
+  carMinimumFollowingSpeed: 0
+  alternatePathChance: 0.25
+  spawnInterval: 3
+  spawnClearRadius: 2
+  spawnIntervalMin: 1
+  spawnIntervalMax: 5
+  spawnCarMinSpeed: 6
+  spawnCarMaxSpeed: 12
+  vehicleMaxSpeed: 5
+  vehicleReachThreshold: 0.5
+--- !u!4 &1858014960
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1858014958}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 38.76389, y: 0, z: 8.5865}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1864016058
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20514,6 +20574,7 @@ SceneRoots:
   - {fileID: 410087041}
   - {fileID: 832575519}
   - {fileID: 1316671049}
+  - {fileID: 955870644}
   - {fileID: 745582991}
   - {fileID: 1315375779}
   - {fileID: 910362168}
@@ -20530,3 +20591,4 @@ SceneRoots:
   - {fileID: 695921419}
   - {fileID: 1553268991}
   - {fileID: 2034186093}
+  - {fileID: 1858014960}

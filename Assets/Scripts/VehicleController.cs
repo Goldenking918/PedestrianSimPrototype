@@ -27,6 +27,13 @@ namespace HealthbarGames
             mRb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         }
 
+        void Start()
+        {
+            TrafficController controller = TrafficController.FindController();
+            if (controller != null)
+                controller.ApplyTo(this);
+        }
+
         void FixedUpdate()
         {
             if (Waypoints == null || Waypoints.Length == 0)

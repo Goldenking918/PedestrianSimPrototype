@@ -26,6 +26,10 @@ public class CarMovement : MonoBehaviour
 
     void Start()
     {
+        TrafficController controller = TrafficController.FindController();
+        if (controller != null)
+            controller.ApplyTo(this);
+
         currentSpeed = speed;
     }
 

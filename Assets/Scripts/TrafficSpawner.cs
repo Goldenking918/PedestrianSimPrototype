@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class TrafficSpawner : MonoBehaviour
 {
+    
     [Tooltip("Car prefabs that can be randomly spawned")]
     public GameObject[] carPrefabs;
     public Transform[] waypoints;
@@ -26,6 +27,10 @@ public class TrafficSpawner : MonoBehaviour
 
     void Start()
     {
+        TrafficController controller = TrafficController.FindController();
+        if (controller != null)
+            controller.ApplyTo(this);
+
         StartCoroutine(SpawnLoop());
     }
 
@@ -72,6 +77,10 @@ public class TrafficSpawner : MonoBehaviour
         var cm = car.GetComponent<CarMovement>();
         if (cm != null)
         {
+            TrafficController controller = TrafficController.FindController();
+            if (controller != null)
+                controller.ApplyTo(cm);
+
             bool useAlternate = alternateWaypoints != null && alternateWaypoints.Length > 0 && Random.value < alternatePathChance;
             cm.waypoints = useAlternate ? alternateWaypoints : waypoints;
             cm.SetAlternateRoute(useAlternate);

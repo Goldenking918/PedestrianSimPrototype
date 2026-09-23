@@ -1,0 +1,8 @@
+{
+    "scenarioName": "High Traffic",
+    "spawnIntervalMin": 1.0,
+    "spawnIntervalMax": 3.0,
+    "carSpeedMin": 8.0,
+    "carSpeedMax": 12.0,
+    "alternatePathChance": 0.30
+}
