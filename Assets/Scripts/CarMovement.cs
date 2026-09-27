@@ -22,6 +22,7 @@ public class CarMovement : MonoBehaviour
 
     private int currentWaypoint = 0;
     private bool isStopped = false;
+    private bool isTrafficPaused = false;
     private float currentSpeed;
 
     void Start()
@@ -40,7 +41,7 @@ public class CarMovement : MonoBehaviour
 
     void Update()
     {
-        if (isStopped)
+        if (isStopped || isTrafficPaused)
             return;
 
         // simple forward obstacle check to avoid overlapping other cars
@@ -122,5 +123,12 @@ public class CarMovement : MonoBehaviour
     public bool IsStopped()
     {
         return isStopped;
+    }
+
+    public void SetTrafficPaused(bool paused)
+    {
+        isTrafficPaused = paused;
+        if (paused)
+            currentSpeed = 0f;
     }
 }

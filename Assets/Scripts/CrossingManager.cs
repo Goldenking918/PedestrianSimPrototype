@@ -17,6 +17,12 @@ public class CrossingManager : MonoBehaviour
     public PlayerMovement playerMovement;
     public float midpointWaitDuration = 5f;
 
+    private void Awake()
+    {
+        if (playerMovement == null)
+            playerMovement = FindFirstObjectByType<PlayerMovement>();
+    }
+
     public void StartCrossing()
     {
         currentState = CrossingState.CrossingToMidpoint;
@@ -62,12 +68,17 @@ public class CrossingManager : MonoBehaviour
     private void PauseCrossing()
     {
         SetPlayerMovementEnabled(false);
+        SetTrafficPaused(true);
         StartCoroutine(ResumeAfterMidpointWait());
     }
 
     private void ResumeCrossing()
     {
+        if (playerMovement != null)
+            playerMovement.RequestFlipAroundHeadset();
+
         SetPlayerMovementEnabled(true);
+        SetTrafficPaused(false);
     }
 
     private IEnumerator ResumeAfterMidpointWait()
@@ -80,5 +91,12 @@ public class CrossingManager : MonoBehaviour
     {
         if (playerMovement != null)
             playerMovement.SetMovementEnabled(enabled);
+    }
+
+    private void SetTrafficPaused(bool paused)
+    {
+        TrafficController trafficController = TrafficController.FindController();
+        if (trafficController != null)
+            trafficController.SetTrafficPaused(paused);
     }
 }

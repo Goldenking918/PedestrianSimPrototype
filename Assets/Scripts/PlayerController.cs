@@ -14,6 +14,7 @@ public class PlayerMovement : MonoBehaviour
     bool isGrounded;
 
     private Vector3 previousCameraLocalPosition;
+    private bool flipPending;
 
     void Start()
     {
@@ -37,7 +38,14 @@ public class PlayerMovement : MonoBehaviour
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
-        Vector3 move = transform.right * x + transform.forward * z;
+        Vector3 forward = vrCamera != null ? vrCamera.forward : transform.forward;
+        Vector3 right = vrCamera != null ? vrCamera.right : transform.right;
+        forward.y = 0f;
+        right.y = 0f;
+        forward.Normalize();
+        right.Normalize();
+
+        Vector3 move = right * x + forward * z;
 
         Vector3 joystickMovement = move * speed * Time.deltaTime;
         Vector3 positionBeforeMove = transform.position;
@@ -57,6 +65,12 @@ public class PlayerMovement : MonoBehaviour
 
     void LateUpdate()
     {
+        if (flipPending)
+        {
+            flipPending = false;
+            FlipAroundHeadset();
+        }
+
         if (!MovementEnabled)
         {
             previousCameraLocalPosition = vrCamera.localPosition;
@@ -82,6 +96,21 @@ public class PlayerMovement : MonoBehaviour
 
         if (!enabled)
             velocity = Vector3.zero;
+    }
+
+    public void FlipAroundHeadset()
+    {
+        if (vrCamera == null)
+            return;
+
+        Transform cameraRig = vrCamera.parent != null ? vrCamera.parent : transform;
+        cameraRig.RotateAround(vrCamera.position, Vector3.up, 180f);
+        previousCameraLocalPosition = vrCamera.localPosition;
+    }
+
+    public void RequestFlipAroundHeadset()
+    {
+        flipPending = true;
     }
 
     private void MoveCameraRig(Vector3 movement)
