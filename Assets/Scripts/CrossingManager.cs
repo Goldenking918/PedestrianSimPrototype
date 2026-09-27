@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class CrossingManager : MonoBehaviour
@@ -13,11 +14,13 @@ public class CrossingManager : MonoBehaviour
 
     public CrossingState currentState = CrossingState.NotStarted;
 
-    public GameObject pauseMenu;
+    public PlayerMovement playerMovement;
+    public float midpointWaitDuration = 5f;
 
     public void StartCrossing()
     {
         currentState = CrossingState.CrossingToMidpoint;
+        SetPlayerMovementEnabled(true);
 
         Debug.Log("Crossing started");
     }
@@ -58,17 +61,24 @@ public class CrossingManager : MonoBehaviour
 
     private void PauseCrossing()
     {
-        if (pauseMenu != null)
-            pauseMenu.SetActive(true);
-
-        // We will add traffic/scenario pausing here.
+        SetPlayerMovementEnabled(false);
+        StartCoroutine(ResumeAfterMidpointWait());
     }
 
     private void ResumeCrossing()
     {
-        if (pauseMenu != null)
-            pauseMenu.SetActive(false);
+        SetPlayerMovementEnabled(true);
+    }
 
-        // We will add traffic/scenario resuming here.
+    private IEnumerator ResumeAfterMidpointWait()
+    {
+        yield return new WaitForSecondsRealtime(midpointWaitDuration);
+        ContinueCrossing();
+    }
+
+    private void SetPlayerMovementEnabled(bool enabled)
+    {
+        if (playerMovement != null)
+            playerMovement.SetMovementEnabled(enabled);
     }
 }

@@ -8,6 +8,8 @@ public class PlayerMovement : MonoBehaviour
     public float jumpHeight = 3f;
     public Transform vrCamera;
 
+    public bool MovementEnabled { get; private set; } = true;
+
     Vector3 velocity;
     bool isGrounded;
 
@@ -20,6 +22,9 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        if (!MovementEnabled)
+            return;
+
         // Check if character is touching the ground
         isGrounded = controller.isGrounded;
 
@@ -52,6 +57,12 @@ public class PlayerMovement : MonoBehaviour
 
     void LateUpdate()
     {
+        if (!MovementEnabled)
+        {
+            previousCameraLocalPosition = vrCamera.localPosition;
+            return;
+        }
+
         // Detect physical movement of the VR headset
         Vector3 cameraMovement = vrCamera.localPosition - previousCameraLocalPosition;
 
@@ -63,6 +74,14 @@ public class PlayerMovement : MonoBehaviour
         controller.Move(worldMovement);
 
         previousCameraLocalPosition = vrCamera.localPosition;
+    }
+
+    public void SetMovementEnabled(bool enabled)
+    {
+        MovementEnabled = enabled;
+
+        if (!enabled)
+            velocity = Vector3.zero;
     }
 
     private void MoveCameraRig(Vector3 movement)
