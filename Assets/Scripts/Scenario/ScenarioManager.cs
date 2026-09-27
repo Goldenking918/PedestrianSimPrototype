@@ -1,16 +1,34 @@
 using UnityEngine;
 using System.IO;
+using TMPro;
 
 public class ScenarioManager : MonoBehaviour
 {
     public ScenarioConfig currentScenario;
     public TrafficController trafficController;
+    public TMP_Dropdown scenarioDropdown;
+    public GameObject scenarioPanel;
 
     void Start()
     {
+        // string selectedScenario = scenarioDropdown.options[scenarioDropdown.value].text;
+        // StartScenario(selectedScenario + ".json");
         StartScenario("HighTraffic.json");
 
     }
+    public void StartSelectedScenario()
+    {
+        string selectedScenario = scenarioDropdown.options[
+            scenarioDropdown.value
+        ].text;
+
+        Debug.Log("Selected scenario: " + selectedScenario);
+
+        StartScenario(selectedScenario);
+
+        scenarioPanel.SetActive(false);
+    }
+
 
     public void LoadScenario(string fileName)
     {
