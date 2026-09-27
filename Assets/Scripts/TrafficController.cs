@@ -5,24 +5,41 @@ public class TrafficController : MonoBehaviour
 {
     public static TrafficController Instance { get; private set; }
 
-    [Header("Car movement")]
-    [Min(0f)] public float carSpeed = 10f;
-    [Min(0f)] public float carAcceleration = 6f;
-    [Min(0f)] public float carDeceleration = 8f;
-    [Min(0f)] public float carDetectionDistance = 3f;
-    [Min(0f)] public float carFrontProbeOffset = 1.5f;
-    [Min(0f)] public float carStopDistance = 1f;
-    [Min(0f)] public float carMinimumStopGap = 2f;
-    [Min(0f)] public float carMinimumFollowingSpeed = 0f;
+    [Header("Reproducibility")]
+    [Tooltip("Scenario random seed. Each spawner derives an independent stream from it (by its index in Traffic Spawners).")]
+    public int randomSeed = 12345;
+
+    [Header("Car behaviour: IDM (base driver)")]
+    [Tooltip("Base IDM parameters. Desired speed is replaced per vehicle by the spawn speed range when that range is non-empty.")]
+    public IdmParameters idm = IdmParameters.UrbanDefault;
+    [Tooltip("Per-vehicle variation around the base IDM parameters.")]
+    public DriverVariation driverVariation = new DriverVariation();
+    [Tooltip("Physical braking limit of all vehicles (m/s^2).")]
+    [Min(0.1f)] public float carMaxDeceleration = 8f;
+
+    [Header("Car behaviour: pedestrian interaction")]
+    public PedestrianInteractionSettings pedestrianInteraction = new PedestrianInteractionSettings();
+
+    [Header("Car following")]
+    [Min(0f)] public float carLeaderLookahead = 80f;
+    [Min(0f)] public float carLeaderLateralTolerance = 1.5f;
 
     [Header("Spawning")]
     [Range(0f, 1f)] public float alternatePathChance = 0.25f;
+    [Tooltip("Fixed headway used when spawnIntervalMax <= spawnIntervalMin (s).")]
     [Min(0f)] public float spawnInterval = 3f;
-    [Min(0f)] public float spawnClearRadius = 2f;
+    [Tooltip("Minimum headway between arrivals at each spawner (s).")]
     [Min(0f)] public float spawnIntervalMin = 1f;
+    [Tooltip("Maximum headway (truncation) at each spawner (s).")]
     [Min(0f)] public float spawnIntervalMax = 5f;
+    [Tooltip("Mean headway before truncation (s). <= 0 uses the midpoint of min and max.")]
+    [Min(0f)] public float spawnIntervalMean = 0f;
+    [Tooltip("Minimum free space ahead of a spawn point before a vehicle may enter (m).")]
+    [Min(0f)] public float minimumSpawnGap = 5f;
+    [Tooltip("Desired speed (v0) range for spawned vehicles (m/s).")]
     [Min(0f)] public float spawnCarMinSpeed = 6f;
     [Min(0f)] public float spawnCarMaxSpeed = 12f;
+    public bool logSpawns = false;
 
     [Header("Rigidbody vehicles")]
     [Min(0f)] public float vehicleMaxSpeed = 5f;
@@ -50,25 +67,29 @@ public class TrafficController : MonoBehaviour
     {
         spawner.alternatePathChance = alternatePathChance;
         spawner.spawnInterval = spawnInterval;
-        spawner.spawnClearRadius = spawnClearRadius;
         spawner.spawnIntervalMin = spawnIntervalMin;
         spawner.spawnIntervalMax = spawnIntervalMax;
+        spawner.spawnIntervalMean = spawnIntervalMean;
+        spawner.minimumSpawnGap = minimumSpawnGap;
         spawner.spawnCarMinSpeed = spawnCarMinSpeed;
         spawner.spawnCarMaxSpeed = spawnCarMaxSpeed;
+        spawner.driverVariation = driverVariation;
+        spawner.randomSeed = randomSeed;
+        spawner.logSpawns = logSpawns;
+
+        int index = trafficSpawners != null ? System.Array.IndexOf(trafficSpawners, spawner) : -1;
+        if (index >= 0)
+            spawner.seedStream = index;
     }
 
-    public void ApplyTo(CarMovement car, bool preserveSpeed = false)
+    /// <summary>Applies shared vehicle settings. Per-vehicle IDM variation is applied afterwards by the spawner.</summary>
+    public void ApplyTo(CarMovement car)
     {
-        if (!preserveSpeed)
-            car.speed = carSpeed;
-
-        car.acceleration = carAcceleration;
-        car.deceleration = carDeceleration;
-        car.detectionDistance = carDetectionDistance;
-        car.frontProbeOffset = carFrontProbeOffset;
-        car.stopDistance = carStopDistance;
-        car.minimumStopGap = carMinimumStopGap;
-        car.minFollowingSpeed = carMinimumFollowingSpeed;
+        car.idm = idm;
+        car.maxDeceleration = carMaxDeceleration;
+        car.pedestrianInteraction = pedestrianInteraction;
+        car.leaderLookahead = carLeaderLookahead;
+        car.leaderLateralTolerance = carLeaderLateralTolerance;
     }
 
     public void ApplyTo(VehicleController vehicle)
@@ -85,7 +106,8 @@ public class TrafficController : MonoBehaviour
     {
         foreach (TrafficSpawner spawner in trafficSpawners)
         {
-            ApplyTo(spawner);
+            if (spawner != null)
+                ApplyTo(spawner);
         }
 
     }

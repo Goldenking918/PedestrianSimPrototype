@@ -1,21 +1,30 @@
 using System;
 
+// Field initialisers are the defaults used when a scenario JSON omits a field (JsonUtility keeps them).
 [Serializable]
 public class ScenarioConfig
 {
     public string scenarioName;
 
-    public float carSpeed;
-    public float carAcceleration;
-    public float carDeceleration;
+    // Reproducibility
+    public int randomSeed = 12345;
 
-    public float spawnIntervalMin;
-    public float spawnIntervalMax;
+    // Base driver (Intelligent Driver Model). Desired speed per vehicle comes from the spawn speed range.
+    public float carSpeed = 12f;                  // v0 fallback when spawnCarMinSpeed >= spawnCarMaxSpeed (m/s)
+    public float carTimeHeadway = 1.5f;           // T (s)
+    public float carMinimumGap = 2f;              // s0 (m)
+    public float carMaxAcceleration = 1.5f;       // a (m/s^2)
+    public float carComfortableDeceleration = 2f; // b (m/s^2)
 
-    public float spawnCarMinSpeed;
-    public float spawnCarMaxSpeed;
+    // Arrivals per spawner: truncated shifted-exponential headways
+    public float spawnIntervalMin = 1f;
+    public float spawnIntervalMax = 5f;
+    public float spawnIntervalMean = 0f;          // <= 0: midpoint of min and max
 
-    public float alternatePathChance;
+    public float spawnCarMinSpeed = 10f;
+    public float spawnCarMaxSpeed = 13f;
 
-    public bool trafficLightsEnabled;
+    public float alternatePathChance = 0.25f;
+
+    public bool trafficLightsEnabled = true;
 }

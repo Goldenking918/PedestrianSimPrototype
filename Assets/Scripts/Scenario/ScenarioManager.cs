@@ -61,20 +61,23 @@ public class ScenarioManager : MonoBehaviour
     }
     private void ApplyScenario()
     {
-        trafficController.carSpeed =
-            currentScenario.carSpeed;
+        trafficController.randomSeed =
+            currentScenario.randomSeed;
 
-        trafficController.carAcceleration =
-            currentScenario.carAcceleration;
-
-        trafficController.carDeceleration =
-            currentScenario.carDeceleration;
+        trafficController.idm.desiredSpeed = currentScenario.carSpeed;
+        trafficController.idm.timeHeadway = currentScenario.carTimeHeadway;
+        trafficController.idm.minimumGap = currentScenario.carMinimumGap;
+        trafficController.idm.maxAcceleration = currentScenario.carMaxAcceleration;
+        trafficController.idm.comfortableDeceleration = currentScenario.carComfortableDeceleration;
 
         trafficController.spawnIntervalMin =
             currentScenario.spawnIntervalMin;
 
         trafficController.spawnIntervalMax =
             currentScenario.spawnIntervalMax;
+
+        trafficController.spawnIntervalMean =
+            currentScenario.spawnIntervalMean;
 
         trafficController.spawnCarMinSpeed =
             currentScenario.spawnCarMinSpeed;
