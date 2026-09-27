@@ -11,12 +11,8 @@ public class PlayerMovement : MonoBehaviour
     Vector3 velocity;
     bool isGrounded;
 
-    private Vector3 previousCameraLocalPosition;
-
-    void Start()
-    {
-        previousCameraLocalPosition = vrCamera.localPosition;
-    }
+    [Tooltip("If the collider falls this far behind the headset (e.g. after being blocked), jump it straight to the headset (m).")]
+    [Min(0.1f)] public float headSyncWarpDistance = 1.5f;
 
     void Update()
     {
@@ -32,7 +28,16 @@ public class PlayerMovement : MonoBehaviour
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
-        Vector3 move = transform.right * x + transform.forward * z;
+        // Move relative to where the camera is facing (mouse look on desktop, head direction in VR)
+        Vector3 forward = transform.forward;
+        if (vrCamera != null)
+        {
+            Vector3 cameraForward = Vector3.ProjectOnPlane(vrCamera.forward, Vector3.up);
+            if (cameraForward.sqrMagnitude > 1e-4f)
+                forward = cameraForward.normalized;
+        }
+        Vector3 right = Vector3.Cross(Vector3.up, forward);
+        Vector3 move = Vector3.ClampMagnitude(right * x + forward * z, 1f);
 
         Vector3 joystickMovement = move * speed * Time.deltaTime;
         Vector3 positionBeforeMove = transform.position;
@@ -52,17 +57,36 @@ public class PlayerMovement : MonoBehaviour
 
     void LateUpdate()
     {
-        // Detect physical movement of the VR headset
-        Vector3 cameraMovement = vrCamera.localPosition - previousCameraLocalPosition;
+        SyncColliderToHead();
+    }
 
-        // Ignore vertical head movement
-        cameraMovement.y = 0;
-        Vector3 worldMovement = vrCamera.parent.TransformVector(cameraMovement);
+    /// <summary>
+    /// Keeps the collider directly under the camera (horizontal position only), so physically walking in VR moves the
+    /// collider and it always matches where the participant really is. Absolute rather than frame-to-frame deltas, so the
+    /// initial play-space offset and any movement the collider was blocked from making never build up into a permanent
+    /// gap. In desktop mode the camera already follows the collider, so this is a no-op there.
+    /// </summary>
+    private void SyncColliderToHead()
+    {
+        if (vrCamera == null || vrCamera.IsChildOf(transform))
+            return;
 
-        // Apply physical movement to the player
-        controller.Move(worldMovement);
+        Vector3 offset = vrCamera.position - transform.position;
+        offset.y = 0f;
+        if (offset.sqrMagnitude < 1e-8f)
+            return;
 
-        previousCameraLocalPosition = vrCamera.localPosition;
+        if (offset.magnitude > headSyncWarpDistance)
+        {
+            // Too far to sweep (start-up, or the head walked through an obstacle): place the collider directly
+            controller.enabled = false;
+            transform.position += offset;
+            controller.enabled = true;
+        }
+        else
+        {
+            controller.Move(offset); // sweeps, so it respects colliders and catches up once clear
+        }
     }
 
     private void MoveCameraRig(Vector3 movement)
