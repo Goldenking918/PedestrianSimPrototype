@@ -26,6 +26,7 @@ public class TrafficSpawner : MonoBehaviour
     public float spawnCarMaxSpeed = 12f;
 
     private Coroutine spawnCoroutine;
+    private bool wasSpawningBeforePause;
 
     void Start()
     {
@@ -104,6 +105,20 @@ public void StopSpawning()
     {
         StopCoroutine(spawnCoroutine);
         spawnCoroutine = null;
+    }
+}
+
+public void SetSpawningPaused(bool paused)
+{
+    if (paused)
+    {
+        wasSpawningBeforePause = spawnCoroutine != null;
+        StopSpawning();
+    }
+    else if (wasSpawningBeforePause)
+    {
+        wasSpawningBeforePause = false;
+        StartSpawning();
     }
 }
 }

@@ -28,6 +28,7 @@ public class TrafficController : MonoBehaviour
     [Min(0f)] public float vehicleMaxSpeed = 5f;
     [Min(0f)] public float vehicleReachThreshold = 0.5f;
     public TrafficSpawner[] trafficSpawners;
+    private bool trafficPaused;
 
     private void Awake()
     {
@@ -105,5 +106,25 @@ public class TrafficController : MonoBehaviour
             if (spawner != null)
                 spawner.StopSpawning();
         }
+    }
+
+    public void SetTrafficPaused(bool paused)
+    {
+        if (trafficPaused == paused)
+            return;
+
+        trafficPaused = paused;
+
+        foreach (TrafficSpawner spawner in trafficSpawners)
+        {
+            if (spawner != null)
+                spawner.SetSpawningPaused(paused);
+        }
+
+        foreach (CarMovement car in FindObjectsByType<CarMovement>(FindObjectsSortMode.None))
+            car.SetTrafficPaused(paused);
+
+        foreach (VehicleController vehicle in FindObjectsByType<VehicleController>(FindObjectsSortMode.None))
+            vehicle.SetTrafficPaused(paused);
     }
 }

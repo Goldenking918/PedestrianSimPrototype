@@ -16,6 +16,7 @@ namespace HealthbarGames
 
         private int mCurrentIndex = 0;
         private bool mStopped = false;
+        private bool mTrafficPaused = false;
         private Rigidbody mRb;
 
         void Awake()
@@ -39,7 +40,7 @@ namespace HealthbarGames
             if (Waypoints == null || Waypoints.Length == 0)
                 return;
 
-            if (mStopped)
+            if (mStopped || mTrafficPaused)
             {
                 // gently brake to stop on XZ plane
                 mRb.linearVelocity = Vector3.Lerp(mRb.linearVelocity, Vector3.zero, 5f * Time.fixedDeltaTime);
@@ -82,6 +83,13 @@ namespace HealthbarGames
         public bool IsStopped()
         {
             return mStopped;
+        }
+
+        public void SetTrafficPaused(bool paused)
+        {
+            mTrafficPaused = paused;
+            if (paused)
+                mRb.linearVelocity = Vector3.zero;
         }
     }
 }
