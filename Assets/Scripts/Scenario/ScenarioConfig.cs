@@ -4,6 +4,7 @@ using System;
 [Serializable]
 public class ScenarioConfig
 {
+    public string scenarioId;                     // e.g. "S1"; defaults to the file name when omitted
     public string scenarioName;
 
     // Reproducibility

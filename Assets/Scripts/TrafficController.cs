@@ -130,6 +130,19 @@ public class TrafficController : MonoBehaviour
         }
     }
 
+    /// <summary>Destroys every active vehicle (used when a scenario is stopped or restarted). Returns how many were removed.</summary>
+    public int ClearAllVehicles()
+    {
+        var vehicles = new System.Collections.Generic.List<CarMovement>(CarMovement.ActiveVehicles);
+        foreach (CarMovement car in vehicles)
+            if (car != null)
+            {
+                car.gameObject.SetActive(false); // leaves ActiveVehicles now, so restarted spawners see a clear road
+                Destroy(car.gameObject);
+            }
+        return vehicles.Count;
+    }
+
     public void SetTrafficPaused(bool paused)
     {
         if (trafficPaused == paused)
