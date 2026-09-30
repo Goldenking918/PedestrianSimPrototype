@@ -29,6 +29,28 @@ public class MouseLook : MonoBehaviour
 
     public bool DesktopMode => forceDesktopControls || !headsetInUse;
 
+    /// <summary>
+    /// Set while an on-screen UI (e.g. the researcher scenario panel) needs the mouse: frees the cursor and stops mouse look.
+    /// </summary>
+    public static bool SuppressLook
+    {
+        get => sSuppressLook;
+        set
+        {
+            if (sSuppressLook == value)
+                return;
+            sSuppressLook = value;
+            if (value)
+                Cursor.lockState = CursorLockMode.None;
+            else if (sInstance != null && sInstance.DesktopMode)
+                Cursor.lockState = CursorLockMode.Locked;
+        }
+    }
+    static bool sSuppressLook;
+    static MouseLook sInstance;
+
+    void Awake() => sInstance = this;
+
     void Start()
     {
         if (cameraTransform == null && Camera.main != null)
@@ -53,7 +75,7 @@ public class MouseLook : MonoBehaviour
             }
         }
 
-        if (!DesktopMode || cameraTransform == null)
+        if (!DesktopMode || cameraTransform == null || SuppressLook)
             return;
 
         // Esc frees the cursor (e.g. to use the Inspector); click to capture it again
@@ -112,7 +134,7 @@ public class MouseLook : MonoBehaviour
         if (poseDriver != null)
             poseDriver.enabled = !desktop;
 
-        Cursor.lockState = desktop ? CursorLockMode.Locked : CursorLockMode.None;
+        Cursor.lockState = desktop && !SuppressLook ? CursorLockMode.Locked : CursorLockMode.None;
 
         if (modeInitialised)
             Debug.Log($"[MouseLook] Switched to {(desktop ? "desktop (mouse + keyboard)" : "headset")} controls.", this);
