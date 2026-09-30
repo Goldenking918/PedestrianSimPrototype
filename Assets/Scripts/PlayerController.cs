@@ -8,14 +8,28 @@ public class PlayerMovement : MonoBehaviour
     public float jumpHeight = 3f;
     public Transform vrCamera;
 
+    public bool MovementEnabled { get; private set; } = true;
+
     Vector3 velocity;
     bool isGrounded;
 
     [Tooltip("If the collider falls this far behind the headset (e.g. after being blocked), jump it straight to the headset (m).")]
     [Min(0.1f)] public float headSyncWarpDistance = 1.5f;
 
+    private Vector3 previousCameraLocalPosition;
+    private bool flipPending;
+
+    void Start()
+    {
+        if (vrCamera != null)
+            previousCameraLocalPosition = vrCamera.localPosition;
+    }
+
     void Update()
     {
+        if (!MovementEnabled)
+            return;
+
         // Check if character is touching the ground
         isGrounded = controller.isGrounded;
 
@@ -57,6 +71,21 @@ public class PlayerMovement : MonoBehaviour
 
     void LateUpdate()
     {
+        if (flipPending)
+        {
+            flipPending = false;
+            FlipAroundHeadset();
+        }
+
+        if (vrCamera == null)
+            return;
+
+        if (!MovementEnabled)
+        {
+            previousCameraLocalPosition = vrCamera.localPosition;
+            return;
+        }
+
         SyncColliderToHead();
     }
 
@@ -87,6 +116,29 @@ public class PlayerMovement : MonoBehaviour
         {
             controller.Move(offset); // sweeps, so it respects colliders and catches up once clear
         }
+    }
+
+    public void SetMovementEnabled(bool enabled)
+    {
+        MovementEnabled = enabled;
+
+        if (!enabled)
+            velocity = Vector3.zero;
+    }
+
+    public void FlipAroundHeadset()
+    {
+        if (vrCamera == null)
+            return;
+
+        Transform cameraRig = vrCamera.parent != null ? vrCamera.parent : transform;
+        cameraRig.RotateAround(vrCamera.position, Vector3.up, 180f);
+        previousCameraLocalPosition = vrCamera.localPosition;
+    }
+
+    public void RequestFlipAroundHeadset()
+    {
+        flipPending = true;
     }
 
     private void MoveCameraRig(Vector3 movement)
