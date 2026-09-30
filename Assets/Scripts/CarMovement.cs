@@ -79,6 +79,7 @@ public class CarMovement : MonoBehaviour
     int mPathCount;
     int mCurrentWaypoint;
     bool mIsStopped;
+    bool mIsTrafficPaused;
     bool mInitialised;
     Vector3 mMoveDirection;
     PedestrianPathObservation mPedestrian;
@@ -92,7 +93,6 @@ public class CarMovement : MonoBehaviour
     }
 
     void OnDisable() => sActive.Remove(this);
-
     void Start()
     {
         if (ConfiguredBySpawner)
@@ -150,7 +150,7 @@ public class CarMovement : MonoBehaviour
             return;
         }
 
-        if (mIsStopped)
+        if (mIsStopped || mIsTrafficPaused)
         {
             CurrentSpeed = 0f;
             AppliedAcceleration = 0f;
@@ -438,4 +438,10 @@ public class CarMovement : MonoBehaviour
             (SafetyOverrideActive ? "\nSAFETY OVERRIDE" : ""));
     }
 #endif
+    public void SetTrafficPaused(bool paused)
+    {
+        mIsTrafficPaused = paused;
+        if (paused)
+            CurrentSpeed = 0f;
+    }
 }

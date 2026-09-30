@@ -51,6 +51,7 @@ public class TrafficSpawner : MonoBehaviour
     private System.Random rng;
     private VehicleGeometry[] prefabGeometry;
     private Vector3[] pathBuffer = new Vector3[8];
+    private bool wasSpawningBeforePause;
 
     void Start()
     {
@@ -225,5 +226,18 @@ public class TrafficSpawner : MonoBehaviour
             Debug.Log($"[TrafficSpawner {name}] vehicle #{cm.VehicleId} ({carPrefabs[plan.prefabIndex].name}) alt={plan.useAlternateRoute} " +
                       $"v0={plan.idm.desiredSpeed:F1} T={plan.idm.timeHeadway:F2} a={plan.idm.maxAcceleration:F2} b={plan.idm.comfortableDeceleration:F2} " +
                       $"entry={entrySpeed:F1} m/s next headway={plan.headwayAfter:F2} s", this);
+    }
+    public void SetSpawningPaused(bool paused)
+    {
+        if (paused)
+        {
+            wasSpawningBeforePause = spawnCoroutine != null;
+            StopSpawning();
+        }
+        else if (wasSpawningBeforePause)
+        {
+            wasSpawningBeforePause = false;
+            StartSpawning();
+        }
     }
 }
