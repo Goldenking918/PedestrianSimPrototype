@@ -1,8 +1,21 @@
 {
     "scenarioName": "Low Traffic",
+    "randomSeed": 1001,
+
+    "carSpeed": 7.5,
+    "carTimeHeadway": 1.5,
+    "carMinimumGap": 2.0,
+    "carMaxAcceleration": 1.5,
+    "carComfortableDeceleration": 2.0,
+
     "spawnIntervalMin": 4.0,
     "spawnIntervalMax": 7.0,
-    "carSpeedMin": 6.0,
-    "carSpeedMax": 9.0,
-    "alternatePathChance": 0.15
+    "spawnIntervalMean": 5.5,
+
+    "spawnCarMinSpeed": 6.0,
+    "spawnCarMaxSpeed": 9.0,
+
+    "alternatePathChance": 0.15,
+
+    "trafficLightsEnabled": true
 }
