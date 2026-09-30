@@ -233,9 +233,27 @@ The simulated environment is based around:
 
 **Symonds Street near the University of Auckland, Auckland, New Zealand.**
 
-The project focuses on an urban pedestrian environment containing a road and pedestrian crossing context.
+The project represents an **uncontrolled mid-block pedestrian crossing / J-walking
+scenario**, based on observed pedestrian behaviour at the Symonds Street location.
 
-The environment should preserve the important spatial relationships of the real location while remaining practical for the available VR/lab space.
+This is **not a formal pedestrian crossing facility**.
+
+There is no:
+- signalised pedestrian crossing
+- zebra crossing
+- pedestrian signal
+- raised pedestrian crossing
+- formal pedestrian-priority crossing treatment
+
+The participant is expected to make their own decision about when and where to
+cross the road, as a pedestrian would when informally crossing a mid-block road
+section.
+
+The crossing should therefore be understood as an **informal road-crossing
+area/trajectory**, rather than a fixed marked crosswalk.
+
+The simulation should preserve the important spatial relationships of the real
+location while remaining practical for the available VR/lab space.
 
 ## 8.2 Physical/lab constraint
 
@@ -283,11 +301,17 @@ The participant should:
 - enter the VR environment
 - understand the task
 - move through the pedestrian environment
-- approach the crossing
-- observe traffic
-- decide when to cross
-- complete the crossing task
-- receive only the minimum necessary in-world instructions
+- approach the mid-block road section
+- observe approaching traffic
+- independently decide whether and when to cross
+- choose their crossing trajectory through the roadway
+- complete the road crossing
+
+The participant should not be guided to a formal crosswalk because the research
+scenario represents an uncontrolled mid-block crossing.
+
+The participant's crossing decision and trajectory are part of the behaviour
+being studied.
 
 Avoid adding unnecessary game mechanics.
 
@@ -313,6 +337,42 @@ Traffic behaviour should be predictable enough for experimental use.
 Avoid uncontrolled randomness where it would make scenarios difficult to reproduce.
 
 If randomness is necessary, use configurable seeds or otherwise record the relevant scenario information.
+
+### Important distinction for traffic modelling
+
+The vehicle behaviour model must reflect an uncontrolled mid-block crossing,
+not a formal pedestrian crossing.
+
+The cars are modelling ordinary urban traffic encountering a pedestrian who may
+choose to cross their path. They should therefore exhibit realistic yielding
+behaviour based on an actual or predicted pedestrian-vehicle conflict.
+
+Do not implement formal-crossing behaviour such as:
+"pedestrian detected near crosswalk -> vehicle stops."
+
+The vehicle should be able to pass safely ahead of a pedestrian when there is
+sufficient time and space, slow progressively when a conflict develops, and
+yield/brake when necessary to avoid a genuine conflict.
+
+## 9.3.1 Uncontrolled mid-block crossing behaviour
+
+The pedestrian crossing is **uncontrolled and informal**.
+
+Vehicles should not behave as though they are approaching a formal pedestrian
+crossing. In particular:
+
+- Do not automatically stop simply because a pedestrian is near the roadway.
+- Do not assume the pedestrian has priority whenever they approach the road.
+- Do not require the pedestrian to cross at a predefined marked crossing point.
+- Vehicles should normally continue according to their traffic behaviour when
+  there is no predicted conflict.
+- Vehicles should respond appropriately when a pedestrian actually enters or
+  is predicted to enter the vehicle's path.
+- Vehicle yielding should be based on the predicted interaction/conflict between
+  the pedestrian and vehicle trajectories rather than proximity alone.
+
+This distinction is important because the research concerns pedestrian
+decision-making and risky behaviour at an uncontrolled mid-block location.
 
 ---
 
