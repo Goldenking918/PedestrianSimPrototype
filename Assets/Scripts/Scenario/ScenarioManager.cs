@@ -14,6 +14,8 @@ public class ScenarioManager : MonoBehaviour
 {
     public ScenarioConfig currentScenario;
     public TrafficController trafficController;
+    [Tooltip("Reset to the start of the crossing whenever a scenario starts, so every run can be completed. Found automatically if empty.")]
+    public CrossingManager crossingManager;
     [Tooltip("Scenario file to start automatically on play (e.g. MediumTraffic.json). Leave empty to wait for the researcher to pick one.")]
     public string autoStartScenario = "";
 
@@ -21,7 +23,7 @@ public class ScenarioManager : MonoBehaviour
     public TMP_Dropdown scenarioDropdown;
     public GameObject scenarioPanel;
 
-    /// <summary>Raised after a scenario has been applied and traffic started (for future logging).</summary>
+    /// <summary>Raised after a scenario has been applied and traffic started (starts a measured run, see MeasurementManager).</summary>
     public event Action<ScenarioConfig> ScenarioStarted;
     /// <summary>Raised after traffic has been stopped and cleared.</summary>
     public event Action ScenarioStopped;
@@ -35,6 +37,10 @@ public class ScenarioManager : MonoBehaviour
     {
         if (trafficController == null)
             trafficController = TrafficController.FindController();
+        if (crossingManager == null)
+            crossingManager = FindFirstObjectByType<CrossingManager>();
+        if (FindFirstObjectByType<MeasurementManager>() == null)
+            gameObject.AddComponent<MeasurementManager>();
         if (GetComponent<ScenarioSelectionPanel>() == null)
             gameObject.AddComponent<ScenarioSelectionPanel>();
     }
@@ -142,6 +148,8 @@ public class ScenarioManager : MonoBehaviour
         currentScenario = config;
         CurrentScenarioFile = fileName;
         ApplyScenario();
+        if (crossingManager != null)
+            crossingManager.StartCrossing(); // fresh crossing for every run (does not move the participant)
         trafficController.ApplyToAllSpawners();
         trafficController.StartAllSpawners();
         IsRunning = true;

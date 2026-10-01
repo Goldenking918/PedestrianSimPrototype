@@ -5,7 +5,8 @@ using UnityEngine;
 /// headset, so the researcher can pick and restart scenarios with the mouse or keyboard while the participant is in VR.
 /// Also used for desktop dev testing.
 ///
-/// Keys: Tab toggles the panel; while it is open, 1-9 start a scenario, R restarts the current one, X stops traffic.
+/// Keys: Tab toggles the panel; while it is open, 1-9 start a scenario, R restarts the current one, X stops traffic
+/// (keys are ignored while typing the participant ID).
 /// Added automatically by <see cref="ScenarioManager"/>.
 /// </summary>
 [RequireComponent(typeof(ScenarioManager))]
@@ -19,6 +20,7 @@ public class ScenarioSelectionPanel : MonoBehaviour
     const float PanelWidth = 360f;
 
     ScenarioManager mManager;
+    MeasurementManager mMeasurement;
     ScenarioManager.ScenarioEntry[] mFiles = new ScenarioManager.ScenarioEntry[0];
     bool mVisible;
     Vector2 mScroll;
@@ -33,6 +35,7 @@ public class ScenarioSelectionPanel : MonoBehaviour
 
     void Start()
     {
+        mMeasurement = FindFirstObjectByType<MeasurementManager>();
         mFiles = ScenarioManager.GetAvailableScenarios();
         SetVisible(!mManager.IsRunning); // prompt the researcher if nothing was auto-started
     }
@@ -48,7 +51,7 @@ public class ScenarioSelectionPanel : MonoBehaviour
         if (Input.GetKeyDown(toggleKey))
             SetVisible(!mVisible);
 
-        if (!mVisible)
+        if (!mVisible || GUIUtility.keyboardControl != 0) // typing in the participant ID box
             return;
 
         for (int i = 0; i < mFiles.Length && i < 9; i++)
@@ -65,6 +68,8 @@ public class ScenarioSelectionPanel : MonoBehaviour
     {
         mVisible = visible;
         MouseLook.SuppressLook = visible;
+        if (!visible)
+            GUIUtility.keyboardControl = 0; // stop typing in the participant ID box
         if (visible)
             mFiles = ScenarioManager.GetAvailableScenarios(); // pick up edited/new files without restarting
     }
@@ -92,7 +97,7 @@ public class ScenarioSelectionPanel : MonoBehaviour
             return;
         }
 
-        float height = Mathf.Min(ReferenceHeight - 20f, 170f + mFiles.Length * 32f);
+        float height = Mathf.Min(ReferenceHeight - 20f, 230f + mFiles.Length * 32f);
         GUILayout.BeginArea(new Rect(10, 10, PanelWidth, height), GUI.skin.box);
         GUILayout.Label("Researcher: scenario", mHeader);
         GUILayout.Label(StatusText(), mSmall);
@@ -122,6 +127,20 @@ public class ScenarioSelectionPanel : MonoBehaviour
         GUI.enabled = true;
         GUILayout.EndHorizontal();
         GUILayout.Label($"[{toggleKey}] hide · number keys start a scenario", mSmall);
+
+        if (mMeasurement != null)
+        {
+            GUILayout.Space(6);
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Participant ID", GUILayout.Width(95));
+            GUI.enabled = !mMeasurement.IsMeasuring; // fixed for the duration of a run
+            mMeasurement.participantId = GUILayout.TextField(mMeasurement.participantId ?? "", 32);
+            GUI.enabled = true;
+            GUILayout.EndHorizontal();
+            if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return)
+                GUIUtility.keyboardControl = 0;
+            GUILayout.Label($"Results: {MeasurementManager.ResultsFile}", mSmall);
+        }
         GUILayout.EndArea();
     }
 
