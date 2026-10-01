@@ -17,6 +17,9 @@ public class CrossingManager : MonoBehaviour
     public PlayerMovement playerMovement;
     public float midpointWaitDuration = 5f;
 
+    /// <summary>True once the pedestrian has stepped off the kerb (entered the RoadEdge trigger) in this crossing.</summary>
+    public bool HasReachedRoadEdge { get; private set; }
+
     private void Awake()
     {
         if (playerMovement == null)
@@ -26,9 +29,20 @@ public class CrossingManager : MonoBehaviour
     public void StartCrossing()
     {
         currentState = CrossingState.CrossingToMidpoint;
+        HasReachedRoadEdge = false;
         SetPlayerMovementEnabled(true);
 
         Debug.Log("Crossing started");
+    }
+
+    public void ReachRoadEdge()
+    {
+        if (currentState != CrossingState.CrossingToMidpoint || HasReachedRoadEdge)
+            return;
+
+        HasReachedRoadEdge = true;
+
+        Debug.Log("Stepped off the kerb.");
     }
 
     public void ReachMidpoint()

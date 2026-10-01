@@ -5,7 +5,8 @@ public class CrossingTrigger : MonoBehaviour
     public enum TriggerType
     {
         Midpoint,
-        End
+        End,
+        RoadEdge // place at the kerb line: entering it = the pedestrian steps off the kerb into the road
     }
 
     public TriggerType triggerType;
@@ -24,6 +25,10 @@ public class CrossingTrigger : MonoBehaviour
         else if (triggerType == TriggerType.End)
         {
             crossingManager.FinishCrossing();
+        }
+        else if (triggerType == TriggerType.RoadEdge)
+        {
+            crossingManager.ReachRoadEdge();
         }
     }
 }

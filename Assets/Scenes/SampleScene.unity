@@ -237,6 +237,74 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2847722011869601123, guid: 4f4701387f7b04173ad2af157861ad19, type: 3}
   m_PrefabInstance: {fileID: 254982216}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6131505
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6131506}
+  - component: {fileID: 6131508}
+  - component: {fileID: 6131507}
+  m_Layer: 0
+  m_Name: CrossingStart
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6131506
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6131505}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -3.32, y: 0.68, z: -5.83}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2048687926}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6131507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6131505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15a54f7f34812f145966bdda7c2c6fdb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  triggerType: 2
+  crossingManager: {fileID: 2048687925}
+--- !u!65 &6131508
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6131505}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 50, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &25480450
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -965,11 +1033,19 @@ MonoBehaviour:
   - {fileID: 1432534436}
   alternatePathChance: 0.395
   spawnInterval: 2.95
-  spawnClearRadius: 3
   spawnIntervalMin: 1
   spawnIntervalMax: 5
+  spawnIntervalMean: 0
+  minimumSpawnGap: 5
   spawnCarMinSpeed: 6
   spawnCarMaxSpeed: 12
+  driverVariation:
+    timeHeadway: 0.15
+    maxAcceleration: 0.15
+    comfortableDeceleration: 0.1
+  randomSeed: 12345
+  seedStream: 0
+  logSpawns: 0
 --- !u!4 &76924677
 Transform:
   m_ObjectHideFlags: 0
@@ -7362,11 +7438,19 @@ MonoBehaviour:
   - {fileID: 262710987}
   alternatePathChance: 0.435
   spawnInterval: 4
-  spawnClearRadius: 3
   spawnIntervalMin: 1
   spawnIntervalMax: 5
+  spawnIntervalMean: 0
+  minimumSpawnGap: 5
   spawnCarMinSpeed: 6
   spawnCarMaxSpeed: 12
+  driverVariation:
+    timeHeadway: 0.15
+    maxAcceleration: 0.15
+    comfortableDeceleration: 0.1
+  randomSeed: 12345
+  seedStream: 0
+  logSpawns: 0
 --- !u!4 &617435932
 Transform:
   m_ObjectHideFlags: 0
@@ -7553,17 +7637,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScenarioManager
   currentScenario:
+    scenarioId: 
     scenarioName: 
+    randomSeed: 12345
     carSpeed: 0
-    carAcceleration: 0
-    carDeceleration: 0
+    carTimeHeadway: 1.5
+    carMinimumGap: 2
+    carMaxAcceleration: 1.5
+    carComfortableDeceleration: 2
     spawnIntervalMin: 0
     spawnIntervalMax: 0
+    spawnIntervalMean: 0
     spawnCarMinSpeed: 0
     spawnCarMaxSpeed: 0
     alternatePathChance: 0
     trafficLightsEnabled: 0
   trafficController: {fileID: 1791471929}
+  crossingManager: {fileID: 0}
+  autoStartScenario: 
   scenarioDropdown: {fileID: 0}
   scenarioPanel: {fileID: 0}
 --- !u!4 &644351898
@@ -13687,11 +13778,19 @@ MonoBehaviour:
   alternateWaypoints: []
   alternatePathChance: 0.25
   spawnInterval: 4
-  spawnClearRadius: 3
   spawnIntervalMin: 1
   spawnIntervalMax: 5
+  spawnIntervalMean: 0
+  minimumSpawnGap: 5
   spawnCarMinSpeed: 6
   spawnCarMaxSpeed: 12
+  driverVariation:
+    timeHeadway: 0.15
+    maxAcceleration: 0.15
+    comfortableDeceleration: 0.1
+  randomSeed: 12345
+  seedStream: 0
+  logSpawns: 0
 --- !u!4 &1185615464
 Transform:
   m_ObjectHideFlags: 0
@@ -18359,11 +18458,19 @@ MonoBehaviour:
   alternateWaypoints: []
   alternatePathChance: 0.23
   spawnInterval: 4
-  spawnClearRadius: 4
   spawnIntervalMin: 1
   spawnIntervalMax: 5
+  spawnIntervalMean: 0
+  minimumSpawnGap: 5
   spawnCarMinSpeed: 6
   spawnCarMaxSpeed: 12
+  driverVariation:
+    timeHeadway: 0.15
+    maxAcceleration: 0.15
+    comfortableDeceleration: 0.1
+  randomSeed: 12345
+  seedStream: 0
+  logSpawns: 0
 --- !u!4 &1722034883
 Transform:
   m_ObjectHideFlags: 0
@@ -18985,21 +19092,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eabea1690008f704db226973728a7851, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrafficController
-  carSpeed: 10
-  carAcceleration: 6
-  carDeceleration: 8
-  carDetectionDistance: 3
-  carFrontProbeOffset: 1.5
-  carStopDistance: 1
-  carMinimumStopGap: 2
-  carMinimumFollowingSpeed: 0
+  randomSeed: 12345
+  idm:
+    desiredSpeed: 12
+    timeHeadway: 1.5
+    minimumGap: 2
+    maxAcceleration: 1.5
+    comfortableDeceleration: 2
+    accelerationExponent: 4
+  driverVariation:
+    timeHeadway: 0.15
+    maxAcceleration: 0.15
+    comfortableDeceleration: 0.1
+  carMaxDeceleration: 8
+  pedestrianInteraction:
+    enabled: 1
+    lookaheadDistance: 60
+    predictionHorizon: 8
+    lateralSafetyMargin: 0.5
+    stopBuffer: 2
+    minimumPedestrianSpeed: 0.25
+    vehicleFirstMargin: 1.5
+    pedestrianFirstMargin: 1
+    releaseHysteresis: 0.3
+    hardSafetyClearance: 0.5
+    logStateChanges: 0
+  carLeaderLookahead: 80
+  carLeaderLateralTolerance: 1.5
   alternatePathChance: 0.25
   spawnInterval: 3
-  spawnClearRadius: 2
   spawnIntervalMin: 1
   spawnIntervalMax: 5
+  spawnIntervalMean: 0
+  minimumSpawnGap: 5
   spawnCarMinSpeed: 6
   spawnCarMaxSpeed: 12
+  logSpawns: 0
   vehicleMaxSpeed: 5
   vehicleReachThreshold: 0.5
   trafficSpawners:
@@ -21940,6 +22068,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 706116381}
+  - {fileID: 6131506}
   - {fileID: 1118056771}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
