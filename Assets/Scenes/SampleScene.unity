@@ -9073,6 +9073,7 @@ MonoBehaviour:
   - AllGreen
   AlternateRouteAllowedPhaseNames:
   - SideA
+  - AllGreen
   AllowedPhaseNames:
   - SideA
 --- !u!65 &764489099

@@ -9,14 +9,14 @@
     "carMaxAcceleration": 1.5,
     "carComfortableDeceleration": 2.0,
 
-    "spawnIntervalMin": 2.0,
-    "spawnIntervalMax": 5.0,
-    "spawnIntervalMean": 3.5,
+    "spawnIntervalMin": 1.5,
+    "spawnIntervalMax": 72.0,
+    "spawnIntervalMean": 9.01,
 
     "spawnCarMinSpeed": 8.0,
     "spawnCarMaxSpeed": 12.0,
 
-    "alternatePathChance": 0.25,
+    "alternatePathChance": 0.1,
 
     "trafficLightsEnabled": true
 }
