@@ -48,6 +48,9 @@ namespace HealthbarGames
         [SerializeField]
         private List<TrafficLightPhase> PhaseList;
 
+        // read-only access for the project's SignalController (added for the pedestrian sim)
+        public IReadOnlyList<TrafficLightPhase> Phases => PhaseList;
+
         // defined programs (Main - normal work, Malfunction - yellow light blinking)
         public enum Program { None, Main, Malfunction };
 
