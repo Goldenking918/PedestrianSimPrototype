@@ -43,6 +43,9 @@ public class CarMovement : MonoBehaviour
     [Header("Pedestrian interaction")]
     public PedestrianInteractionSettings pedestrianInteraction = new PedestrianInteractionSettings();
 
+    [Header("Traffic signals")]
+    public SignalResponseSettings signalResponse = new SignalResponseSettings();
+
     [Header("Path following")]
     [Tooltip("Distance at which the next waypoint becomes the target (m).")]
     [Min(0.01f)] public float waypointReachThreshold = 1f;
@@ -69,12 +72,17 @@ public class CarMovement : MonoBehaviour
     public PedestrianConflictAssessment PedestrianConflict { get; private set; } = PedestrianConflictAssessment.Empty;
     /// <summary>True when the pedestrian layer is more restrictive than IDM this step.</summary>
     public bool PedestrianConstraintActive { get; private set; }
+    /// <summary>Signal ahead and the driver's response to it (stop / proceed on amber).</summary>
+    public SignalAssessment SignalState { get; private set; } = SignalAssessment.Empty;
+    /// <summary>True when the signal layer is the most restrictive constraint this step.</summary>
+    public bool SignalConstraintActive { get; private set; }
     public bool SafetyOverrideActive { get; private set; }
     public int SafetyOverrideCount { get; private set; }
     /// <summary>Unit horizontal direction of travel.</summary>
     public Vector3 TravelDirection { get; private set; }
 
     readonly PedestrianConflictModel mConflictModel = new PedestrianConflictModel();
+    readonly SignalResponseModel mSignalModel = new SignalResponseModel();
     Vector3[] mPath = new Vector3[8];
     int mPathCount;
     int mCurrentWaypoint;
@@ -175,6 +183,12 @@ public class CarMovement : MonoBehaviour
         PedestrianConstraintActive = PedestrianConflict.constraintAcceleration < acceleration;
         if (PedestrianConstraintActive)
             acceleration = PedestrianConflict.constraintAcceleration;
+
+        // 3. Traffic signal layer: may only lower the acceleration
+        SignalState = EvaluateSignal(v);
+        SignalConstraintActive = SignalState.constraintAcceleration < acceleration;
+        if (SignalConstraintActive)
+            acceleration = SignalState.constraintAcceleration;
         acceleration = Mathf.Clamp(acceleration, -maxDeceleration, idm.maxAcceleration);
 
         // Ballistic integration that never reverses (Treiber & Kesting's recommended IDM update)
@@ -190,7 +204,7 @@ public class CarMovement : MonoBehaviour
             displacement = 0.5f * (v + newSpeed) * dt;
         }
 
-        // 3. Hard safety envelope
+        // 4. Hard safety envelope
         bool pedestrianOverride = false;
         float allowed = MaxSafeDisplacement(gap, ref pedestrianOverride);
         if (displacement > allowed)
@@ -253,6 +267,30 @@ public class CarMovement : MonoBehaviour
         }
     }
 
+    /// <summary>Finds the nearest stop line on the route ahead and applies the driver's signal response.</summary>
+    SignalAssessment EvaluateSignal(float speed)
+    {
+        ISignalStop nearest = null;
+        float nearestAlong = float.PositiveInfinity;
+        if (signalResponse != null)
+        {
+            float searchLength = Geometry.frontExtent + signalResponse.lookaheadDistance;
+            var stops = SignalStops.Active;
+            for (int i = 0; i < stops.Count; i++)
+            {
+                if (stops[i].TryGetCrossing(mPath, mPathCount, searchLength, out float along) && along < nearestAlong)
+                {
+                    nearest = stops[i];
+                    nearestAlong = along;
+                }
+            }
+        }
+
+        if (nearest == null)
+            return mSignalModel.Evaluate(null, SignalIndication.None, float.PositiveInfinity, speed, idm, signalResponse, maxDeceleration);
+        return mSignalModel.Evaluate(nearest, nearest.IndicationFor(this), nearestAlong - Geometry.frontExtent, speed, idm, signalResponse, maxDeceleration);
+    }
+
     PedestrianPathObservation ObservePedestrian()
     {
         var obs = new PedestrianPathObservation();
@@ -278,6 +316,10 @@ public class CarMovement : MonoBehaviour
         float allowed = float.PositiveInfinity;
         if (!float.IsPositiveInfinity(gap))
             allowed = gap - 0.5f;
+
+        // A driver who has decided to stop for a signal never crosses the stop line
+        if (SignalState.decision == SignalDecision.Stop && SignalState.distanceToStopLine >= 0f)
+            allowed = Mathf.Min(allowed, SignalState.distanceToStopLine);
 
         if (mPedestrian.present && pedestrianInteraction != null)
         {
@@ -434,7 +476,8 @@ public class CarMovement : MonoBehaviour
         UnityEditor.Handles.Label(transform.position + Vector3.up * 2.5f,
             $"#{VehicleId} v={CurrentSpeed:F1} v0={idm.desiredSpeed:F1}\n" +
             $"aIDM={IdmAcceleration:F2} a={AppliedAcceleration:F2}\n" +
-            $"{c.state} TTC={Format(c.timeToConflict)} aReq={Format(c.requiredDeceleration)}" +
+            $"{c.state} TTC={Format(c.timeToConflict)} aReq={Format(c.requiredDeceleration)}\n" +
+            $"signal {SignalState.indication} {SignalState.decision} d={Format(SignalState.distanceToStopLine)}" +
             (SafetyOverrideActive ? "\nSAFETY OVERRIDE" : ""));
     }
 #endif
