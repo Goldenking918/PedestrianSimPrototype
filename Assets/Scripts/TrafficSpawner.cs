@@ -206,7 +206,15 @@ public class TrafficSpawner : MonoBehaviour
 
     void SpawnCar(in VehicleArrivalPlan plan, float entrySpeed)
     {
-        GameObject car = Instantiate(carPrefabs[plan.prefabIndex], transform.position, transform.rotation);
+        // Face along the route (the spawner's own rotation does not necessarily point down the road)
+        Quaternion rotation = transform.rotation;
+        int count = BuildPath(RouteFor(plan));
+        Vector3 heading = pathBuffer[1] - pathBuffer[0];
+        heading.y = 0f;
+        if (count > 1 && heading.sqrMagnitude > 1e-4f)
+            rotation = Quaternion.LookRotation(heading);
+
+        GameObject car = Instantiate(carPrefabs[plan.prefabIndex], transform.position, rotation);
         var cm = car.GetComponent<CarMovement>();
         if (cm == null)
             return;

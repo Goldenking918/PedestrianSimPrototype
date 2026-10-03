@@ -20,6 +20,12 @@ public class TrafficController : MonoBehaviour
     [Header("Car behaviour: pedestrian interaction")]
     public PedestrianInteractionSettings pedestrianInteraction = new PedestrianInteractionSettings();
 
+    [Header("Traffic signals")]
+    [Tooltip("Fixed-time signal plan computed from the scenario's flows (ITE clearance intervals, Webster cycle and splits).")]
+    public SignalPlanSettings signalPlan = new SignalPlanSettings();
+    [Tooltip("How drivers respond to signals (amber dilemma-zone rule, stop-line gap).")]
+    public SignalResponseSettings signalResponse = new SignalResponseSettings();
+
     [Header("Car following")]
     [Min(0f)] public float carLeaderLookahead = 80f;
     [Min(0f)] public float carLeaderLateralTolerance = 1.5f;
@@ -46,6 +52,11 @@ public class TrafficController : MonoBehaviour
     [Min(0f)] public float vehicleReachThreshold = 0.5f;
     public TrafficSpawner[] trafficSpawners;
     private bool trafficPaused;
+    private SignalController signalController;
+
+    /// <summary>Plan currently running on the traffic lights (null if the scene's own light program is used).</summary>
+    public SignalPlan CurrentSignalPlan => signalController != null ? signalController.CurrentPlan : null;
+    public SignalController Signals => signalController;
 
     private void Awake()
     {
@@ -56,6 +67,48 @@ public class TrafficController : MonoBehaviour
         }
 
         Instance = this;
+
+        // Take over the lights before the TrafficLightManager's Start launches its own program.
+        if (signalPlan != null && signalPlan.enabled)
+        {
+            signalController = GetComponent<SignalController>();
+            if (signalController == null)
+                signalController = gameObject.AddComponent<SignalController>();
+            if (!signalController.TakeControl())
+            {
+                Destroy(signalController);
+                signalController = null;
+            }
+        }
+    }
+
+    private void Start()
+    {
+        // Lights run from the start with the default flows; each scenario restarts them with its own plan.
+        ApplySignalPlan();
+    }
+
+    /// <summary>Expected arrivals per lane (each spawner feeds one lane) from the current spawn settings (veh/h).</summary>
+    public float FlowPerLane => 3600f / TrafficArrivalModel.ExpectedHeadway(spawnIntervalMin, spawnIntervalMean, spawnIntervalMax, spawnInterval);
+
+    /// <summary>
+    /// Computes the fixed-time plan for the current flows and restarts the signal cycle at its first phase.
+    /// Through flow = flow per lane; turning flow = flow per lane x turning share (only if any spawner has a turning route).
+    /// </summary>
+    public SignalPlan ApplySignalPlan()
+    {
+        if (signalController == null || !signalController.HasLights)
+            return null;
+
+        float flow = FlowPerLane;
+        bool anyTurning = trafficSpawners != null && System.Array.Exists(trafficSpawners,
+            sp => sp != null && sp.alternateWaypoints != null && sp.alternateWaypoints.Length > 0);
+        float turnFlow = anyTurning ? flow * alternatePathChance : 0f;
+
+        SignalPlan plan = SignalTiming.BuildPlan(signalPlan, signalController.PhaseOrder, flow, turnFlow);
+        signalController.StartPlan(plan);
+        signalController.Paused = trafficPaused;
+        return plan;
     }
 
     private void OnDestroy()
@@ -91,6 +144,7 @@ public class TrafficController : MonoBehaviour
         car.pedestrianInteraction = pedestrianInteraction;
         car.leaderLookahead = carLeaderLookahead;
         car.leaderLateralTolerance = carLeaderLateralTolerance;
+        car.signalResponse = signalResponse;
     }
 
     public void ApplyTo(VehicleController vehicle)
@@ -149,6 +203,9 @@ public class TrafficController : MonoBehaviour
             return;
 
         trafficPaused = paused;
+
+        if (signalController != null)
+            signalController.Paused = paused; // signal timing freezes with the traffic
 
         foreach (TrafficSpawner spawner in trafficSpawners)
         {

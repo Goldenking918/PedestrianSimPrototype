@@ -151,12 +151,15 @@ public class ScenarioManager : MonoBehaviour
         if (crossingManager != null)
             crossingManager.StartCrossing(); // fresh crossing for every run (does not move the participant)
         trafficController.ApplyToAllSpawners();
+        SignalPlan signals = trafficController.ApplySignalPlan(); // restart the lights at phase 1: identical timing every run
         trafficController.StartAllSpawners();
         IsRunning = true;
 
         // Full applied configuration, so a run can be traced back to its exact conditions.
         Debug.Log($"[ScenarioManager] Started scenario {currentScenario.scenarioId} '{currentScenario.scenarioName}' " +
-                  $"from {fileName} (seed {currentScenario.randomSeed}) at t={Time.time:F2}s\n{JsonUtility.ToJson(currentScenario, true)}", this);
+                  $"from {fileName} (seed {currentScenario.randomSeed}) at t={Time.time:F2}s\n" +
+                  $"Signals: {(signals != null ? signals.Describe() : "scene's own light program")}\n" +
+                  $"{JsonUtility.ToJson(currentScenario, true)}", this);
         ScenarioStarted?.Invoke(currentScenario);
         return true;
     }
