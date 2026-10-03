@@ -48,13 +48,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarMovement
   waypoints: []
-  speed: 10
-  acceleration: 6
-  deceleration: 8
-  detectionDistance: 3
-  frontProbeOffset: 1.5
-  stopDistance: 1
-  minFollowingSpeed: 0
+  idm:
+    desiredSpeed: 12
+    timeHeadway: 1.5
+    minimumGap: 2
+    maxAcceleration: 1.5
+    comfortableDeceleration: 2
+    accelerationExponent: 4
+  maxDeceleration: 8
+  leaderLookahead: 80
+  leaderLateralTolerance: 1.5
+  crossingVehicleDistance: 8
+  pedestrianInteraction:
+    enabled: 1
+    lookaheadDistance: 60
+    predictionHorizon: 8
+    lateralSafetyMargin: 0.5
+    stopBuffer: 2
+    minimumPedestrianSpeed: 0.25
+    vehicleFirstMargin: 1.5
+    pedestrianFirstMargin: 1
+    releaseHysteresis: 0.3
+    hardSafetyClearance: 0.5
+    logStateChanges: 0
+  waypointReachThreshold: 1
+  turnRate: 5
+  drawDebugGizmos: 1
 --- !u!54 &-1874279843422406470
 Rigidbody:
   m_ObjectHideFlags: 0
