@@ -33022,7 +33022,6 @@ GameObject:
   - component: {fileID: 953985801}
   - component: {fileID: 953985800}
   - component: {fileID: 953985799}
-  - component: {fileID: 953985798}
   m_Layer: 0
   m_Name: AerialPlane
   m_TagString: Untagged
@@ -33030,28 +33029,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!64 &953985798
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 953985797}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &953985799
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -33257,7 +33234,7 @@ Transform:
   m_GameObject: {fileID: 955870643}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 36.74, y: 0.3, z: -5.9}
+  m_LocalPosition: {x: 36.74, y: 0.1, z: -5.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -33312,6 +33289,7 @@ MonoBehaviour:
   cameraTransform: {fileID: 0}
   forceDesktopControls: 0
   headsetPollInterval: 0.25
+  desktopEyeHeight: 1.6
 --- !u!43 &959578486
 Mesh:
   m_ObjectHideFlags: 0

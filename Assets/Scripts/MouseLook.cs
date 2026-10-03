@@ -1,3 +1,4 @@
+using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.XR;
 using TrackedPoseDriver = UnityEngine.InputSystem.XR.TrackedPoseDriver;
@@ -9,6 +10,8 @@ using TrackedPoseDriver = UnityEngine.InputSystem.XR.TrackedPoseDriver;
 /// Sits on the XR Origin: in desktop mode, yaw turns the rig around the camera and pitch tilts Camera Offset
 /// (the camera's parent). The camera's TrackedPoseDriver is paused in desktop mode so a connected but unworn
 /// headset doesn't fight the mouse.
+/// With Floor tracking the headset supplies the eye height, so in desktop mode Camera Offset is raised to
+/// <see cref="desktopEyeHeight"/> instead (XR Origin sits on the pavement surface).
 /// </summary>
 public class MouseLook : MonoBehaviour
 {
@@ -20,12 +23,15 @@ public class MouseLook : MonoBehaviour
     public bool forceDesktopControls = false;
     [Tooltip("How often the headset state is checked (s).")]
     [Min(0.05f)] public float headsetPollInterval = 0.25f;
+    [Tooltip("Camera height above the XR Origin in desktop mode (m). In VR the headset provides the real eye height.")]
+    [Min(0f)] public float desktopEyeHeight = 1.6f;
 
     float xRotation = 0f;
     float nextPollTime;
     bool headsetInUse;
     bool modeInitialised;
     TrackedPoseDriver poseDriver;
+    XROrigin xrOrigin;
 
     public bool DesktopMode => forceDesktopControls || !headsetInUse;
 
@@ -57,6 +63,7 @@ public class MouseLook : MonoBehaviour
             cameraTransform = Camera.main.transform;
         if (cameraTransform != null)
             poseDriver = cameraTransform.GetComponent<TrackedPoseDriver>();
+        xrOrigin = GetComponent<XROrigin>();
 
         headsetInUse = IsHeadsetInUse();
         ApplyMode();
@@ -75,7 +82,13 @@ public class MouseLook : MonoBehaviour
             }
         }
 
-        if (!DesktopMode || cameraTransform == null || SuppressLook)
+        if (!DesktopMode || cameraTransform == null)
+            return;
+
+        // Re-applied every frame: XR Origin resets the offset height whenever tracking (re)initialises
+        SetOffsetHeight(desktopEyeHeight);
+
+        if (SuppressLook)
             return;
 
         // Esc frees the cursor (e.g. to use the Inspector); click to capture it again
@@ -129,6 +142,7 @@ public class MouseLook : MonoBehaviour
             PitchPivot().localRotation = Quaternion.identity;
             if (desktop)
                 cameraTransform.localRotation = Quaternion.identity; // drop any leftover head rotation
+            SetOffsetHeight(desktop ? desktopEyeHeight : HeadsetOffsetHeight());
         }
 
         if (poseDriver != null)
@@ -139,6 +153,26 @@ public class MouseLook : MonoBehaviour
         if (modeInitialised)
             Debug.Log($"[MouseLook] Switched to {(desktop ? "desktop (mouse + keyboard)" : "headset")} controls.", this);
         modeInitialised = true;
+    }
+
+    /// <summary>Offset height XR Origin uses for the headset: 0 with Floor tracking (the headset reports eye height), else Camera Y Offset.</summary>
+    float HeadsetOffsetHeight()
+    {
+        if (xrOrigin == null)
+            return 0f;
+        bool deviceRelative = xrOrigin.CurrentTrackingOriginMode == TrackingOriginModeFlags.Device ||
+                              xrOrigin.CurrentTrackingOriginMode == TrackingOriginModeFlags.Unbounded;
+        return deviceRelative ? xrOrigin.CameraYOffset : 0f;
+    }
+
+    void SetOffsetHeight(float y)
+    {
+        Transform offset = PitchPivot();
+        if (offset == cameraTransform)
+            return; // no Camera Offset object to move
+        Vector3 position = offset.localPosition;
+        if (!Mathf.Approximately(position.y, y))
+            offset.localPosition = new Vector3(position.x, y, position.z);
     }
 
     Transform PitchPivot()
