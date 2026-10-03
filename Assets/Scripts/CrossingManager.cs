@@ -16,7 +16,8 @@ public class CrossingManager : MonoBehaviour
 
     public PlayerMovement playerMovement;
     [Tooltip("Stop everything at the midpoint and flip the view so the participant can turn around in the room. " +
-             "Untick to let the participant walk straight through the midpoint (e.g. when the lab space is long enough).")]
+             "Untick to let the participant walk straight through the midpoint (e.g. when the lab space is long enough). " +
+             "This is only the default: once a researcher sets 'Midpoint flip' in the researcher panel, that saved choice is used.")]
     public bool midpointFlipEnabled = true;
     public float midpointWaitDuration = 5f;
 
@@ -26,6 +27,9 @@ public class CrossingManager : MonoBehaviour
 
     private float midpointResumeTime;
 
+    // Researcher's choice from the researcher panel, saved on this PC/headset so it applies to every session.
+    private const string MidpointFlipPrefKey = "MidpointFlipEnabled";
+
     /// <summary>True once the pedestrian has stepped off the kerb (entered the RoadEdge trigger) in this crossing.</summary>
     public bool HasReachedRoadEdge { get; private set; }
 
@@ -33,6 +37,20 @@ public class CrossingManager : MonoBehaviour
     {
         if (playerMovement == null)
             playerMovement = FindFirstObjectByType<PlayerMovement>();
+        if (PlayerPrefs.HasKey(MidpointFlipPrefKey))
+            midpointFlipEnabled = PlayerPrefs.GetInt(MidpointFlipPrefKey) == 1;
+    }
+
+    /// <summary>
+    /// Turns the midpoint pause and flip on or off and remembers the choice for future sessions.
+    /// The turn prompt and approach marker follow this setting too.
+    /// </summary>
+    public void SetMidpointFlipEnabled(bool enabled)
+    {
+        midpointFlipEnabled = enabled;
+        PlayerPrefs.SetInt(MidpointFlipPrefKey, enabled ? 1 : 0);
+        PlayerPrefs.Save();
+        Debug.Log($"Midpoint flip {(enabled ? "enabled" : "disabled")} (saved for future sessions).");
     }
 
     public void StartCrossing()

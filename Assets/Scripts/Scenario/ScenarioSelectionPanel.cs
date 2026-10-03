@@ -97,7 +97,7 @@ public class ScenarioSelectionPanel : MonoBehaviour
             return;
         }
 
-        float height = Mathf.Min(ReferenceHeight - 20f, 230f + mFiles.Length * 32f);
+        float height = Mathf.Min(ReferenceHeight - 20f, 290f + mFiles.Length * 32f);
         GUILayout.BeginArea(new Rect(10, 10, PanelWidth, height), GUI.skin.box);
         GUILayout.Label("Researcher: scenario", mHeader);
         GUILayout.Label(StatusText(), mSmall);
@@ -139,6 +139,18 @@ public class ScenarioSelectionPanel : MonoBehaviour
             GUILayout.EndHorizontal();
             if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return)
                 GUIUtility.keyboardControl = 0;
+
+            // Midpoint pause + view flip (and its prompt and approach marker). Saved for future sessions and
+            // recorded in the CSV, so it is locked while a run is being measured.
+            CrossingManager crossing = mManager.crossingManager;
+            if (crossing != null)
+            {
+                GUI.enabled = !mMeasurement.IsMeasuring;
+                bool flip = GUILayout.Toggle(crossing.midpointFlipEnabled, " Midpoint flip (pause and turn around halfway)");
+                if (flip != crossing.midpointFlipEnabled)
+                    crossing.SetMidpointFlipEnabled(flip);
+                GUI.enabled = true;
+            }
             GUILayout.Label($"Results: {MeasurementManager.ResultsFile}", mSmall);
         }
         GUILayout.EndArea();
