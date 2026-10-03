@@ -141,7 +141,11 @@ public class MouseLook : MonoBehaviour
         {
             PitchPivot().localRotation = Quaternion.identity;
             if (desktop)
-                cameraTransform.localRotation = Quaternion.identity; // drop any leftover head rotation
+            {
+                // Drop the last head pose (the paused TrackedPoseDriver leaves it), or its height adds to desktopEyeHeight
+                cameraTransform.localRotation = Quaternion.identity;
+                cameraTransform.localPosition = Vector3.zero;
+            }
             SetOffsetHeight(desktop ? desktopEyeHeight : HeadsetOffsetHeight());
         }
 

@@ -1,3 +1,4 @@
+using Unity.XR.CoreUtils;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -7,6 +8,12 @@ public class PlayerMovement : MonoBehaviour
     public float gravity = -9.81f;
     public float jumpHeight = 3f;
     public Transform vrCamera;
+    [Tooltip("Rig that carries the camera (the XR Origin). Defaults to the camera's XR Origin. It follows the collider: " +
+             "horizontally with movement, and vertically to the ground under the collider, so the camera rises and falls with " +
+             "the ground (kerbs, steps) in both desktop and VR. Camera Offset only holds the eye height (see MouseLook).")]
+    public Transform cameraRig;
+    [Tooltip("Smoothing when the rig follows a change in ground height, e.g. stepping onto a kerb (s). 0 = snap.")]
+    [Min(0f)] public float rigHeightSmoothTime = 0.08f;
 
     public bool MovementEnabled { get; private set; } = true;
 
@@ -23,6 +30,12 @@ public class PlayerMovement : MonoBehaviour
     {
         if (vrCamera != null)
             previousCameraLocalPosition = vrCamera.localPosition;
+        if (cameraRig == null && vrCamera != null)
+        {
+            XROrigin origin = vrCamera.GetComponentInParent<XROrigin>();
+            cameraRig = origin != null ? origin.transform : vrCamera.parent;
+        }
+        FollowGroundHeight(snap: true);
     }
 
     void Update()
@@ -80,13 +93,47 @@ public class PlayerMovement : MonoBehaviour
         if (vrCamera == null)
             return;
 
-        if (!MovementEnabled)
-        {
+        if (MovementEnabled)
+            SyncColliderToHead();
+        else
             previousCameraLocalPosition = vrCamera.localPosition;
-            return;
-        }
 
-        SyncColliderToHead();
+        FollowGroundHeight(snap: false);
+    }
+
+    /// <summary>Height of the ground under the collider: the bottom of the capsule, less the controller's skin width.</summary>
+    public float FeetHeight
+    {
+        get
+        {
+            float centreY = transform.TransformPoint(controller.center).y;
+            float halfHeight = controller.height * 0.5f * Mathf.Abs(transform.lossyScale.y);
+            return centreY - halfHeight - controller.skinWidth;
+        }
+    }
+
+    /// <summary>
+    /// Puts the rig's floor at the collider's feet, so the camera goes up and down with the ground. Rig height is set
+    /// absolutely each frame (never accumulated from movement deltas), so it cannot drift: walking up then back down a
+    /// step returns the camera to its original height.
+    /// </summary>
+    private void FollowGroundHeight(bool snap)
+    {
+        if (!HasSeparateRig() || controller == null)
+            return;
+
+        float target = FeetHeight;
+        Vector3 position = cameraRig.position;
+        if (snap || rigHeightSmoothTime <= 0f || Mathf.Abs(target - position.y) > headSyncWarpDistance)
+            position.y = target;
+        else
+            position.y = Mathf.Lerp(position.y, target, 1f - Mathf.Exp(-Time.deltaTime / rigHeightSmoothTime));
+        cameraRig.position = position;
+    }
+
+    private bool HasSeparateRig()
+    {
+        return cameraRig != null && cameraRig != transform && !cameraRig.IsChildOf(transform) && !transform.IsChildOf(cameraRig);
     }
 
     /// <summary>
@@ -131,8 +178,9 @@ public class PlayerMovement : MonoBehaviour
         if (vrCamera == null)
             return;
 
-        Transform cameraRig = vrCamera.parent != null ? vrCamera.parent : transform;
-        cameraRig.RotateAround(vrCamera.position, Vector3.up, 180f);
+        // Turn the whole rig about the head (as MouseLook does for yaw), not Camera Offset, whose rotation MouseLook owns
+        Transform rig = HasSeparateRig() ? cameraRig : (vrCamera.parent != null ? vrCamera.parent : transform);
+        rig.RotateAround(vrCamera.position, Vector3.up, 180f);
         previousCameraLocalPosition = vrCamera.localPosition;
     }
 
@@ -141,13 +189,13 @@ public class PlayerMovement : MonoBehaviour
         flipPending = true;
     }
 
+    /// <summary>Carries the rig along with the collider's horizontal movement; height is handled by <see cref="FollowGroundHeight"/>.</summary>
     private void MoveCameraRig(Vector3 movement)
     {
-        if (vrCamera == null || vrCamera.parent == null || vrCamera.parent == transform || vrCamera.parent.IsChildOf(transform))
-        {
+        if (!HasSeparateRig())
             return;
-        }
 
-        vrCamera.parent.position += movement;
+        movement.y = 0f;
+        cameraRig.position += movement;
     }
 }
