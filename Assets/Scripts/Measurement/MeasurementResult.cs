@@ -7,13 +7,14 @@ using System.Globalization;
 public class MeasurementResult
 {
     public const string CsvHeader =
-        "Scenario,Run,Participant ID,Date Time,Waiting Time (s),Crossing Duration (s)," +
+        "Scenario,Run,Participant ID,Date Time,Midpoint Flip,Waiting Time (s),Crossing Duration (s)," +
         "Closest Vehicle Distance (m),Relative Speed (m/s),TTC (s),Crossing Outcome";
 
     public string scenario = "";
     public int run;
     public string participantId = "";
     public string dateTime = "";
+    public string midpointFlip = ""; // On or Off: whether this run used the midpoint pause and view flip
 
     public float waitingTime = float.NaN;
     public float crossingDuration = float.NaN;
@@ -25,7 +26,7 @@ public class MeasurementResult
     public string ToCsvRow()
     {
         return string.Join(",",
-            Text(scenario), run.ToString(CultureInfo.InvariantCulture), Text(participantId), Text(dateTime),
+            Text(scenario), run.ToString(CultureInfo.InvariantCulture), Text(participantId), Text(dateTime), Text(midpointFlip),
             Number(waitingTime), Number(crossingDuration), Number(closestVehicleDistance),
             Number(relativeSpeed), Number(timeToCollision), Text(crossingOutcome));
     }

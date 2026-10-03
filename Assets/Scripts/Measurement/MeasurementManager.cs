@@ -83,6 +83,8 @@ public class MeasurementManager : MonoBehaviour
             scenario = string.IsNullOrWhiteSpace(scenario.scenarioName) ? scenario.scenarioId : scenario.scenarioName,
             participantId = participantId,
             dateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+            // Recorded at the start of the run (the researcher panel locks the setting while a run is being measured)
+            midpointFlip = crossingManager == null ? "" : crossingManager.midpointFlipEnabled ? "On" : "Off",
         };
         startTime = Time.time;
         roadEdgeTime = float.NaN;
@@ -220,6 +222,7 @@ public class MeasurementManager : MonoBehaviour
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(file));
+            KeepOldFileIfColumnsChanged(file);
             bool isNewFile = !File.Exists(file);
             result.run = isNewFile ? 1 : File.ReadLines(file).Count(); // header line + previous rows => next run number
             using (var writer = new StreamWriter(file, true))
@@ -238,5 +241,19 @@ public class MeasurementManager : MonoBehaviour
             Debug.LogError($"[MeasurementManager] Could not write {file} ({e.Message}). Is it open in Excel? " +
                            $"This run was saved to {backup} instead.");
         }
+    }
+
+    /// <summary>
+    /// If the existing CSV was written with different columns (e.g. before a column was added), rename it and start a
+    /// fresh file, so rows with different columns are never mixed. Nothing is deleted.
+    /// </summary>
+    static void KeepOldFileIfColumnsChanged(string file)
+    {
+        if (!File.Exists(file) || File.ReadLines(file).FirstOrDefault() == MeasurementResult.CsvHeader)
+            return;
+        string kept = Path.Combine(Path.GetDirectoryName(file), $"measurement_results_old_columns_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+        File.Move(file, kept);
+        Debug.LogWarning($"[MeasurementManager] The CSV columns have changed, so the existing results were kept as {kept} " +
+                         $"and a new {Path.GetFileName(file)} was started.");
     }
 }

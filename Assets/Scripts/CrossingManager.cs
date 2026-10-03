@@ -15,7 +15,20 @@ public class CrossingManager : MonoBehaviour
     public CrossingState currentState = CrossingState.NotStarted;
 
     public PlayerMovement playerMovement;
+    [Tooltip("Stop everything at the midpoint and flip the view so the participant can turn around in the room. " +
+             "Untick to let the participant walk straight through the midpoint (e.g. when the lab space is long enough). " +
+             "This is only the default: once a researcher sets 'Midpoint flip' in the researcher panel, that saved choice is used.")]
+    public bool midpointFlipEnabled = true;
     public float midpointWaitDuration = 5f;
+
+    /// <summary>Seconds left in the midpoint pause (0 when not paused). Used by <see cref="MidpointTurnPrompt"/>.</summary>
+    public float MidpointTimeRemaining =>
+        currentState == CrossingState.WaitingForTurn ? Mathf.Max(0f, midpointResumeTime - Time.realtimeSinceStartup) : 0f;
+
+    private float midpointResumeTime;
+
+    // Researcher's choice from the researcher panel, saved on this PC/headset so it applies to every session.
+    private const string MidpointFlipPrefKey = "MidpointFlipEnabled";
 
     /// <summary>True once the pedestrian has stepped off the kerb (entered the RoadEdge trigger) in this crossing.</summary>
     public bool HasReachedRoadEdge { get; private set; }
@@ -24,6 +37,20 @@ public class CrossingManager : MonoBehaviour
     {
         if (playerMovement == null)
             playerMovement = FindFirstObjectByType<PlayerMovement>();
+        if (PlayerPrefs.HasKey(MidpointFlipPrefKey))
+            midpointFlipEnabled = PlayerPrefs.GetInt(MidpointFlipPrefKey) == 1;
+    }
+
+    /// <summary>
+    /// Turns the midpoint pause and flip on or off and remembers the choice for future sessions.
+    /// The turn prompt and approach marker follow this setting too.
+    /// </summary>
+    public void SetMidpointFlipEnabled(bool enabled)
+    {
+        midpointFlipEnabled = enabled;
+        PlayerPrefs.SetInt(MidpointFlipPrefKey, enabled ? 1 : 0);
+        PlayerPrefs.Save();
+        Debug.Log($"Midpoint flip {(enabled ? "enabled" : "disabled")} (saved for future sessions).");
     }
 
     public void StartCrossing()
@@ -49,6 +76,13 @@ public class CrossingManager : MonoBehaviour
     {
         if (currentState != CrossingState.CrossingToMidpoint)
             return;
+
+        if (!midpointFlipEnabled)
+        {
+            currentState = CrossingState.CrossingToEnd; // no stop or flip: carry straight on to the End trigger
+            Debug.Log("Reached midpoint (flip disabled). Continuing crossing.");
+            return;
+        }
 
         currentState = CrossingState.WaitingForTurn;
 
@@ -83,6 +117,7 @@ public class CrossingManager : MonoBehaviour
     {
         SetPlayerMovementEnabled(false);
         SetTrafficPaused(true);
+        midpointResumeTime = Time.realtimeSinceStartup + midpointWaitDuration;
         StartCoroutine(ResumeAfterMidpointWait());
     }
 
