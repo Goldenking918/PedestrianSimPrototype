@@ -1,0 +1,24 @@
+{
+    "scenarioId": "N1",
+    "scenarioName": "Medium Traffic (Night)",
+    "randomSeed": 1002,
+
+    "carSpeed": 10.0,
+    "carTimeHeadway": 1.5,
+    "carMinimumGap": 2.0,
+    "carMaxAcceleration": 1.5,
+    "carComfortableDeceleration": 2.0,
+
+    "spawnIntervalMin": 1.5,
+    "spawnIntervalMax": 72.0,
+    "spawnIntervalMean": 9.01,
+
+    "spawnCarMinSpeed": 8.0,
+    "spawnCarMaxSpeed": 12.0,
+
+    "alternatePathChance": 0.1,
+
+    "trafficLightsEnabled": true,
+
+    "night": true
+}
