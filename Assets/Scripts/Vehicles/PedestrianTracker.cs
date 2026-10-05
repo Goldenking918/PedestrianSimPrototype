@@ -46,6 +46,17 @@ public static class PedestrianTracker
         sLastSampleFrame = -1;
     }
 
+    /// <summary>
+    /// Forgets the previous sample, so a teleport (e.g. returning the participant to the start) is not seen as a burst of
+    /// walking speed by the vehicles or the measurements.
+    /// </summary>
+    public static void ResetMotion()
+    {
+        sHasSample = false;
+        sVelocity = Vector3.zero;
+        sLastSampleFrame = -1;
+    }
+
     /// <summary>Samples once per rendered frame; safe to call from every vehicle.</summary>
     public static void EnsureSampled()
     {

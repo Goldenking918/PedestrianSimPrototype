@@ -26,6 +26,10 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 previousCameraLocalPosition;
     private bool flipPending;
 
+    // Where the rig and collider were when the session started (see ReturnToStart)
+    private Vector3 startRigPosition, startBodyPosition;
+    private Quaternion startRigRotation, startBodyRotation;
+
     void Start()
     {
         if (vrCamera != null)
@@ -36,6 +40,45 @@ public class PlayerMovement : MonoBehaviour
             cameraRig = origin != null ? origin.transform : vrCamera.parent;
         }
         FollowGroundHeight(snap: true);
+
+        startBodyPosition = transform.position;
+        startBodyRotation = transform.rotation;
+        if (HasSeparateRig())
+        {
+            startRigPosition = cameraRig.position;
+            startRigRotation = cameraRig.rotation;
+        }
+    }
+
+    /// <summary>
+    /// Brings the participant back to the start of the crossing, as at the start of the session. The rig returns to its
+    /// starting pose, which also undoes the midpoint flip. In VR this restores the original match between the physical room
+    /// and the virtual street, so a participant standing on their start mark in the room is at the virtual start point.
+    /// Called when a scenario is started or restarted, and by the researcher panel.
+    /// </summary>
+    public void ReturnToStart()
+    {
+        flipPending = false;
+        velocity = Vector3.zero;
+
+        controller.enabled = false;
+        if (HasSeparateRig())
+        {
+            cameraRig.SetPositionAndRotation(startRigPosition, startRigRotation);
+            // Collider straight under the head (in VR the head may be away from the room's centre)
+            Vector3 head = vrCamera != null ? vrCamera.position : startRigPosition;
+            transform.position = new Vector3(head.x, startBodyPosition.y, head.z);
+        }
+        else
+        {
+            transform.SetPositionAndRotation(startBodyPosition, startBodyRotation);
+        }
+        controller.enabled = true;
+
+        if (vrCamera != null)
+            previousCameraLocalPosition = vrCamera.localPosition;
+        PedestrianTracker.ResetMotion(); // the jump back is not walking
+        Debug.Log("Participant returned to the start.");
     }
 
     void Update()
