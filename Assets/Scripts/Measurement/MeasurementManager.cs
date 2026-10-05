@@ -46,10 +46,19 @@ public class MeasurementManager : MonoBehaviour
     readonly HashSet<int> carsInNearMiss = new HashSet<int>(); // cars in an ongoing near-miss encounter
 
     public bool IsMeasuring => measuring;
+    /// <summary>Results of the most recently finished run (also written to the CSV files).</summary>
+    public MeasurementResult LastResult { get; private set; }
 
-    public static string ResultsFolder => Application.isEditor
-        ? Path.Combine(Application.dataPath, "..", "MeasurementResults")     // next to the Unity project
-        : Path.Combine(Application.persistentDataPath, "MeasurementResults"); // headset / built app
+    /// <summary>Time source (s). Normally Unity's game time; tests replace it to control time frame by frame.</summary>
+    public Func<float> clock = () => Time.time;
+
+    /// <summary>Tests only: write the CSV files here instead of the real results folder.</summary>
+    public static string resultsFolderOverride;
+
+    public static string ResultsFolder => !string.IsNullOrEmpty(resultsFolderOverride) ? resultsFolderOverride
+        : Application.isEditor
+            ? Path.Combine(Application.dataPath, "..", "MeasurementResults")     // next to the Unity project
+            : Path.Combine(Application.persistentDataPath, "MeasurementResults"); // headset / built app
     public static string ResultsFile => Path.GetFullPath(Path.Combine(ResultsFolder, "measurement_results.csv"));
     public static string EventsFile => Path.GetFullPath(Path.Combine(ResultsFolder, "measurement_events.csv"));
 
@@ -82,13 +91,17 @@ public class MeasurementManager : MonoBehaviour
             FinishMeasuring("Incomplete", "application closed");
     }
 
-    void OnScenarioStopped()
+    void OnScenarioStopped() => StopMeasuring("scenario stopped or restarted by the researcher");
+
+    /// <summary>Ends the current run as Incomplete (the scenario stopped before the participant reached the end).</summary>
+    public void StopMeasuring(string reason)
     {
         if (measuring)
-            FinishMeasuring("Incomplete", "scenario stopped or restarted by the researcher");
+            FinishMeasuring("Incomplete", reason);
     }
 
-    void StartMeasuring(ScenarioConfig scenario)
+    /// <summary>Starts a fresh run. Called when a scenario starts.</summary>
+    public void StartMeasuring(ScenarioConfig scenario)
     {
         result = new MeasurementResult
         {
@@ -102,7 +115,7 @@ public class MeasurementManager : MonoBehaviour
             // Recorded at the start of the run (the researcher panel locks the setting while a run is being measured)
             midpointFlip = crossingManager == null ? "" : crossingManager.midpointFlipEnabled ? "On" : "Off",
         };
-        startTime = Time.time;
+        startTime = clock();
         roadEdgeTime = float.NaN;
         pauseTotal = 0f;
         collided = false;
@@ -110,16 +123,19 @@ public class MeasurementManager : MonoBehaviour
         carsInNearMiss.Clear();
         lastState = crossingManager != null ? crossingManager.currentState : CrossingManager.CrossingState.NotStarted;
         measuring = true;
-        LogEvent(0f, "Scenario started", -1, $"{result.scenario}, seed {result.randomSeed}, midpoint flip {result.midpointFlip}");
+        LogEvent(0f, "Scenario started", -1, FormattableString.Invariant($"{result.scenario}, seed {result.randomSeed}, midpoint flip {result.midpointFlip}"));
         Debug.Log($"[MeasurementManager] Measuring '{result.scenario}' for participant '{participantId}'.", this);
     }
 
-    void Update()
+    void Update() => Step();
+
+    /// <summary>One measurement step (every frame). Public so tests can drive it.</summary>
+    public void Step()
     {
         if (!measuring || crossingManager == null)
             return;
 
-        float now = Time.time - startTime;
+        float now = clock() - startTime;
 
         // --- Waiting time: the moment the pedestrian first steps off the kerb (RoadEdge trigger) ---
         if (float.IsNaN(roadEdgeTime) && crossingManager.HasReachedRoadEdge)
@@ -144,7 +160,7 @@ public class MeasurementManager : MonoBehaviour
             if (lastState == CrossingManager.CrossingState.WaitingForTurn)
             {
                 pauseTotal += now - pauseStartTime;
-                LogEvent(now, "Crossing resumed", -1, $"pause lasted {now - pauseStartTime:F2} s");
+                LogEvent(now, "Crossing resumed", -1, FormattableString.Invariant($"pause lasted {now - pauseStartTime:F2} s"));
             }
             lastState = state;
 
@@ -172,26 +188,12 @@ public class MeasurementManager : MonoBehaviour
             if (car == null)
                 continue;
             int id = car.VehicleId;
-
-            // Work in the car's own frame, on the ground (2D, height ignored):
-            //   along = how far ahead (+) or behind (-) of the car's centre the pedestrian is
-            //   side  = how far to the left/right of the car's centre line the pedestrian is
-            Vector3 forward = car.transform.forward;
-            forward.y = 0f;
-            forward.Normalize();
-            Vector3 right = new Vector3(forward.z, 0f, -forward.x);
-            Vector3 offset = pedestrian - car.transform.position;
-            offset.y = 0f;
-            float along = Vector3.Dot(offset, forward);
-            float side = Vector3.Dot(offset, right);
+            Vector3 carPosition = car.transform.position;
+            Vector3 carForward = car.transform.forward;
             VehicleGeometry outline = car.Geometry; // car's rectangular footprint, measured from its colliders
 
-            // --- Closest vehicle distance ---
-            // From the centre of the pedestrian's body (the collider under the headset) to the nearest point on the
-            // car's outline, measured flat along the ground. 0 = the pedestrian's centre is on the car's edge.
-            float outsideSide = Mathf.Max(Mathf.Abs(side) - outline.halfWidth, 0f);
-            float outsideEnds = Mathf.Max(Mathf.Max(along - outline.frontExtent, -outline.rearExtent - along), 0f);
-            float distance = Mathf.Sqrt(outsideSide * outsideSide + outsideEnds * outsideEnds);
+            // --- Closest vehicle distance (definition: see DistanceToOutline) ---
+            float distance = DistanceToOutline(pedestrian, carPosition, carForward, outline);
             if (float.IsNaN(result.closestVehicleDistance) || distance < result.closestVehicleDistance)
                 result.closestVehicleDistance = distance;
 
@@ -202,37 +204,19 @@ public class MeasurementManager : MonoBehaviour
             {
                 collided = true;
                 if (carsInContact.Add(id))
-                    LogEvent(now, "Collision", id, $"car speed {car.CurrentSpeed:F1} m/s");
+                    LogEvent(now, "Collision", id, FormattableString.Invariant($"car speed {car.CurrentSpeed:F1} m/s"));
             }
             else if (distance > bodyRadius + ContactReleaseMargin)
             {
                 carsInContact.Remove(id);
             }
 
-            // --- Time-to-collision (TTC) and relative speed ---
-            // Only calculated when ALL of these are true:
-            //   1. The pedestrian is in the car's path: their body overlaps the strip of road the car will drive over
-            //      (car half-width + body radius either side of the car's centre line, assuming the car keeps going straight).
-            //   2. The pedestrian is in front of the car (not beside or behind it).
-            //   3. The car and pedestrian are getting closer (relative speed above zero).
-            //
-            // Distance used for TTC: measured along the car's direction of travel, from the car's FRONT BUMPER to the
-            // nearest edge of the pedestrian's body (body centre minus body radius). This is the gap the car has to close
-            // before it would make contact.
-            //
-            // Relative (closing) speed: the car's speed minus the part of the pedestrian's walking speed that goes the same
-            // way as the car. Walking straight across the road adds ~0, so it is then ~the car's speed. Walking towards
-            // the car makes it bigger; walking away from it (in the car's direction) makes it smaller.
-            //
-            // TTC = gap / relative speed = seconds until the car would reach the pedestrian if both kept their current
-            // speed and direction. The lowest TTC of the run (the most dangerous moment) is reported, together with the
-            // relative speed at that same moment. If TTC is never calculated, both cells are left empty.
-            bool inPath = Mathf.Abs(side) < outline.halfWidth + bodyRadius;
-            float gap = along - outline.frontExtent - bodyRadius;
-            float relativeSpeed = car.CurrentSpeed - Vector3.Dot(pedestrianVelocity, forward);
-            if (inPath && gap > 0f && relativeSpeed > MinClosingSpeed)
+            // --- Time-to-collision (TTC) and relative speed (definitions: see TryTimeToCollision) ---
+            // The lowest TTC of the run (the most dangerous moment) is reported, together with the relative speed at that
+            // same moment. If TTC is never calculated, both cells are left empty.
+            if (TryTimeToCollision(pedestrian, pedestrianVelocity, bodyRadius, carPosition, carForward, outline,
+                                   car.CurrentSpeed, out float ttc, out float relativeSpeed))
             {
-                float ttc = gap / relativeSpeed;
                 if (float.IsNaN(result.timeToCollision) || ttc < result.timeToCollision)
                 {
                     result.timeToCollision = ttc;
@@ -243,7 +227,7 @@ public class MeasurementManager : MonoBehaviour
                 // TTC below the threshold. Logged once per car per encounter: the encounter lasts until TTC can no longer
                 // be calculated for that car (it has stopped, passed, or the pedestrian has left its path).
                 if (ttc < nearMissTtc && carsInNearMiss.Add(id))
-                    LogEvent(now, "Near miss", id, $"TTC {ttc:F2} s, relative speed {relativeSpeed:F1} m/s");
+                    LogEvent(now, "Near miss", id, FormattableString.Invariant($"TTC {ttc:F2} s, relative speed {relativeSpeed:F1} m/s"));
             }
             else
             {
@@ -252,6 +236,73 @@ public class MeasurementManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Closest vehicle distance: from the centre of the pedestrian's body (the collider under the headset) to the nearest
+    /// point on the car's outline (its rectangular footprint), measured flat along the ground (2D, height ignored).
+    /// 0 = the pedestrian's centre is on or inside the car's outline.
+    /// </summary>
+    public static float DistanceToOutline(Vector3 pedestrian, Vector3 carPosition, Vector3 carForward, VehicleGeometry outline)
+    {
+        CarFrame(pedestrian, carPosition, carForward, out float along, out float side, out _);
+        float outsideSide = Mathf.Max(Mathf.Abs(side) - outline.halfWidth, 0f);
+        float outsideEnds = Mathf.Max(Mathf.Max(along - outline.frontExtent, -outline.rearExtent - along), 0f);
+        return Mathf.Sqrt(outsideSide * outsideSide + outsideEnds * outsideEnds);
+    }
+
+    /// <summary>
+    /// Time-to-collision (TTC) and relative speed. Only calculated (returns true) when ALL of these are true:
+    ///   1. The pedestrian is in the car's path: their body overlaps the strip of road the car will drive over
+    ///      (car half-width + body radius either side of the car's centre line, assuming the car keeps going straight).
+    ///   2. The pedestrian is in front of the car (not beside or behind it).
+    ///   3. The car and pedestrian are getting closer (relative speed above zero).
+    ///
+    /// Distance used for TTC: measured along the car's direction of travel, from the car's FRONT BUMPER to the
+    /// nearest edge of the pedestrian's body (body centre minus body radius). This is the gap the car has to close
+    /// before it would make contact.
+    ///
+    /// Relative (closing) speed: the car's speed minus the part of the pedestrian's walking speed that goes the same
+    /// way as the car. Walking straight across the road adds ~0, so it is then ~the car's speed. Walking towards
+    /// the car makes it bigger; walking away from it (in the car's direction) makes it smaller.
+    ///
+    /// TTC = gap / relative speed = seconds until the car would reach the pedestrian if both kept their current
+    /// speed and direction.
+    /// </summary>
+    public static bool TryTimeToCollision(Vector3 pedestrian, Vector3 pedestrianVelocity, float bodyRadius,
+        Vector3 carPosition, Vector3 carForward, VehicleGeometry outline, float carSpeed,
+        out float ttc, out float relativeSpeed)
+    {
+        CarFrame(pedestrian, carPosition, carForward, out float along, out float side, out Vector3 forward);
+        bool inPath = Mathf.Abs(side) < outline.halfWidth + bodyRadius;
+        float gap = along - outline.frontExtent - bodyRadius;
+        relativeSpeed = carSpeed - Vector3.Dot(pedestrianVelocity, forward);
+        if (inPath && gap > 0f && relativeSpeed > MinClosingSpeed)
+        {
+            ttc = gap / relativeSpeed;
+            return true;
+        }
+        ttc = float.NaN;
+        relativeSpeed = float.NaN;
+        return false;
+    }
+
+    /// <summary>
+    /// The pedestrian's position in the car's own frame, on the ground (2D, height ignored):
+    ///   along = how far ahead (+) or behind (-) of the car's centre the pedestrian is
+    ///   side  = how far to the left/right of the car's centre line the pedestrian is
+    /// </summary>
+    static void CarFrame(Vector3 pedestrian, Vector3 carPosition, Vector3 carForward, out float along, out float side, out Vector3 forward)
+    {
+        forward = carForward;
+        forward.y = 0f;
+        forward.Normalize();
+        Vector3 right = new Vector3(forward.z, 0f, -forward.x);
+        Vector3 offset = pedestrian - carPosition;
+        offset.y = 0f;
+        along = Vector3.Dot(offset, forward);
+        side = Vector3.Dot(offset, right);
+    }
+
+    // Event details use invariant formatting (always '.' as the decimal point), like the CSV numbers.
     void LogEvent(float time, string name, int vehicleId = -1, string details = "")
     {
         result.events.Add(new MeasurementEvent { time = time, name = name, vehicleId = vehicleId, details = details });
@@ -260,7 +311,7 @@ public class MeasurementManager : MonoBehaviour
     void FinishMeasuring(string outcome, string reason = "")
     {
         measuring = false;
-        float endTime = Time.time - startTime;
+        float endTime = clock() - startTime;
         if (outcome == "Incomplete")
             LogEvent(endTime, "Scenario stopped before end", -1, reason);
 
@@ -273,6 +324,7 @@ public class MeasurementManager : MonoBehaviour
             result.crossingDuration = endTime - roadEdgeTime - pauseTotal;
 
         result.crossingOutcome = collided ? "Collision" : outcome;
+        LastResult = result;
         Save(result);
     }
 
