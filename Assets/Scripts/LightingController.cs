@@ -149,17 +149,50 @@ public class LightingController : MonoBehaviour
         if (!on)
             return;
 
-        // One centred spotlight per car (looks almost the same as two, at half the cost), placed at the front bumper.
+        Vector3 forward = Vector3.ProjectOnPlane(car.transform.forward, Vector3.up).normalized;
+        var go = new GameObject(HeadlightName);
+        go.transform.SetParent(car.transform, false);
+
+        // Lamp positions. Each car model has its lamps in a different place, so the car prefabs carry marker points
+        // (HeadlampL/R, TaillampL/R) on their actual lamps; a marker's scale is the glow size in metres. Car models
+        // without markers fall back to a generic placement at the corners.
+        Transform headL = car.transform.Find("HeadlampL"), headR = car.transform.Find("HeadlampR");
+        Transform tailL = car.transform.Find("TaillampL"), tailR = car.transform.Find("TaillampR");
+        bool hasMarkers = headL != null && headR != null;
+
+        // Generic fallback positions (front and rear corners at a typical lamp height)
         float bottom = car.transform.position.y;
         foreach (Renderer r in car.GetComponentsInChildren<Renderer>())
             bottom = Mathf.Min(bottom, r.bounds.min.y);
-        Vector3 forward = Vector3.ProjectOnPlane(car.transform.forward, Vector3.up).normalized;
         Vector3 front = car.transform.position + forward * car.Geometry.frontExtent;
+        Vector3 rear = car.transform.position - forward * car.Geometry.rearExtent;
+        front.y = rear.y = bottom + headlightHeight;
 
-        var go = new GameObject(HeadlightName);
-        go.transform.SetParent(car.transform, false);
-        go.transform.SetPositionAndRotation(new Vector3(front.x, bottom + headlightHeight, front.z),
+        // One centred spotlight between the headlamps lights the road (looks almost the same as two, at half the cost).
+        // Placed before the glows are added, because the glows are its children and would move with it.
+        Vector3 lightPosition = hasMarkers ? (headL.position + headR.position) * 0.5f : front;
+        go.transform.SetPositionAndRotation(lightPosition + forward * 0.05f,
             Quaternion.LookRotation(forward) * Quaternion.Euler(headlightTilt, 0f, 0f));
+
+        if (hasMarkers)
+        {
+            foreach (Transform m in new[] { headL, headR })
+                AddGlow(go.transform, headlampMaterial, m.position + forward * 0.01f, forward, m.lossyScale);
+            foreach (Transform m in new[] { tailL, tailR })
+                if (m != null)
+                    AddGlow(go.transform, taillampMaterial, m.position - forward * 0.01f, -forward, m.lossyScale);
+        }
+        else
+        {
+            float side = Mathf.Max(0.1f, car.Geometry.halfWidth - 0.3f);
+            Vector3 right = Vector3.Cross(Vector3.up, forward);
+            foreach (float s in new[] { -side, side })
+            {
+                AddGlow(go.transform, headlampMaterial, front + right * s + forward * 0.03f, forward, lampGlowSize);
+                AddGlow(go.transform, taillampMaterial, rear + right * s - forward * 0.03f, -forward, lampGlowSize);
+            }
+        }
+
         var light = go.AddComponent<Light>();
         light.type = LightType.Spot;
         light.color = headlightColor;
@@ -168,22 +201,14 @@ public class LightingController : MonoBehaviour
         light.spotAngle = headlightAngle;
         light.innerSpotAngle = headlightAngle * 0.5f;
         light.shadows = LightShadows.None;
-
-        // Glowing headlamps (front corners, facing forward) and tail lights (rear corners, facing back). Flat shapes with
-        // no light of their own, so they cost almost nothing; the scene's bloom gives them their glare.
-        float side = Mathf.Max(0.1f, car.Geometry.halfWidth - 0.3f);
-        Vector3 right = Vector3.Cross(Vector3.up, forward);
-        Vector3 rear = car.transform.position - forward * car.Geometry.rearExtent;
-        float height = bottom + headlightHeight;
-        foreach (float s in new[] { -side, side })
-        {
-            AddGlow(go.transform, headlampMaterial, new Vector3(front.x, height, front.z) + right * s + forward * 0.03f, forward);
-            AddGlow(go.transform, taillampMaterial, new Vector3(rear.x, height, rear.z) + right * s - forward * 0.03f, -forward);
-        }
     }
 
-    /// <summary>A small glowing rectangle at <paramref name="position"/>, visible from the <paramref name="facing"/> side.</summary>
-    void AddGlow(Transform parent, Material material, Vector3 position, Vector3 facing)
+    /// <summary>
+    /// A small glowing rectangle (width x height in metres) at <paramref name="position"/>, visible from the
+    /// <paramref name="facing"/> side. Flat shapes with no light of their own, so they cost almost nothing; the scene's
+    /// bloom gives them their glare.
+    /// </summary>
+    void AddGlow(Transform parent, Material material, Vector3 position, Vector3 facing, Vector2 size)
     {
         if (material == null)
             return;
@@ -192,7 +217,7 @@ public class LightingController : MonoBehaviour
         // A quad is visible from its -Z side, so point its +Z away from the viewer
         glow.transform.SetPositionAndRotation(position, Quaternion.LookRotation(-facing));
         Vector3 parentScale = parent.lossyScale;
-        glow.transform.localScale = new Vector3(lampGlowSize.x / parentScale.x, lampGlowSize.y / parentScale.y, 1f);
+        glow.transform.localScale = new Vector3(size.x / parentScale.x, size.y / parentScale.y, 1f);
         glow.GetComponent<MeshFilter>().sharedMesh = Resources.GetBuiltinResource<Mesh>("Quad.fbx");
         var r = glow.GetComponent<MeshRenderer>();
         r.sharedMaterial = material;
