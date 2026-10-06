@@ -116,6 +116,12 @@ public class CarMovement : MonoBehaviour
 
     public void SetInitialSpeed(float speed) => CurrentSpeed = Mathf.Max(0f, speed);
 
+    /// <summary>
+    /// For a car placed part-way along its route (pre-filling the road at scenario start): it drives on towards
+    /// waypoints[index] instead of back to the first waypoint.
+    /// </summary>
+    public void SetNextWaypoint(int index) => mCurrentWaypoint = Mathf.Clamp(index, 0, waypoints != null ? waypoints.Length : 0);
+
     // Called by StopLine or other controllers to pause/resume movement
     public void SetStopped(bool stop)
     {

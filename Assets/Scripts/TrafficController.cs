@@ -42,6 +42,8 @@ public class TrafficController : MonoBehaviour
     [Min(0f)] public float spawnIntervalMean = 0f;
     [Tooltip("Minimum free space ahead of a spawn point before a vehicle may enter (m).")]
     [Min(0f)] public float minimumSpawnGap = 5f;
+    [Tooltip("At scenario start, fill the road with the cars that would be on it after this many seconds of traffic (s).")]
+    [Min(0f)] public float prefillSeconds = 90f;
     [Tooltip("Desired speed (v0) range for spawned vehicles (m/s).")]
     [Min(0f)] public float spawnCarMinSpeed = 6f;
     [Min(0f)] public float spawnCarMaxSpeed = 12f;
@@ -125,6 +127,7 @@ public class TrafficController : MonoBehaviour
         spawner.spawnIntervalMax = spawnIntervalMax;
         spawner.spawnIntervalMean = spawnIntervalMean;
         spawner.minimumSpawnGap = minimumSpawnGap;
+        spawner.prefillSeconds = prefillSeconds;
         spawner.spawnCarMinSpeed = spawnCarMinSpeed;
         spawner.spawnCarMaxSpeed = spawnCarMaxSpeed;
         spawner.driverVariation = driverVariation;

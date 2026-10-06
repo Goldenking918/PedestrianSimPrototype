@@ -3209,6 +3209,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4770199113816368, guid: f9526b7c12770f14aa830082aa6d9b45, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4770199113816368, guid: f9526b7c12770f14aa830082aa6d9b45, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -7.77
+      objectReference: {fileID: 0}
     - target: {fileID: 1279561549187176308, guid: f9526b7c12770f14aa830082aa6d9b45, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 4
@@ -3928,6 +3936,7 @@ MonoBehaviour:
   spawnIntervalMax: 5
   spawnIntervalMean: 0
   minimumSpawnGap: 5
+  prefillSeconds: 0
   spawnCarMinSpeed: 6
   spawnCarMaxSpeed: 12
   driverVariation:
@@ -4690,7 +4699,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4642154361904384, guid: 332e08e35cda1b84e8c36c123299b8ac, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 109.68193
+      value: 101.3
       objectReference: {fileID: 0}
     - target: {fileID: 4642154361904384, guid: 332e08e35cda1b84e8c36c123299b8ac, type: 3}
       propertyPath: m_LocalRotation.w
@@ -5453,7 +5462,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4917032449352002, guid: a60988b24f8ff094ba511054edf48a9d, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 85.74902
+      value: 77.6
       objectReference: {fileID: 0}
     - target: {fileID: 4917032449352002, guid: a60988b24f8ff094ba511054edf48a9d, type: 3}
       propertyPath: m_LocalRotation.w
@@ -35353,6 +35362,7 @@ MonoBehaviour:
   spawnIntervalMax: 5
   spawnIntervalMean: 0
   minimumSpawnGap: 5
+  prefillSeconds: 0
   spawnCarMinSpeed: 6
   spawnCarMaxSpeed: 12
   driverVariation:
@@ -37176,6 +37186,7 @@ MonoBehaviour:
     spawnCarMinSpeed: 0
     spawnCarMaxSpeed: 0
     alternatePathChance: 0
+    trafficPrefillSeconds: 90
     trafficLightsEnabled: 0
     night: 0
   trafficController: {fileID: 1791471929}
@@ -47414,7 +47425,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4872864705531724, guid: ba33f5f0a254c9443956b40146028648, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 71.04956
+      value: 62.6
       objectReference: {fileID: 0}
     - target: {fileID: 4872864705531724, guid: ba33f5f0a254c9443956b40146028648, type: 3}
       propertyPath: m_LocalRotation.w
@@ -55310,7 +55321,7 @@ Transform:
   m_GameObject: {fileID: 962785624}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 94.55, y: 0.095, z: 88.5}
+  m_LocalPosition: {x: 94.55, y: 0.1, z: 82.4}
   m_LocalScale: {x: 34.9, y: 89, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -71670,6 +71681,7 @@ MonoBehaviour:
   spawnIntervalMax: 5
   spawnIntervalMean: 0
   minimumSpawnGap: 5
+  prefillSeconds: 0
   spawnCarMinSpeed: 6
   spawnCarMaxSpeed: 12
   driverVariation:
@@ -82452,7 +82464,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4539606987814986, guid: ac16a24c584766f4e905adc7db85b93d, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -40.880154
+      value: -40.9
       objectReference: {fileID: 0}
     - target: {fileID: 4539606987814986, guid: ac16a24c584766f4e905adc7db85b93d, type: 3}
       propertyPath: m_LocalPosition.y
@@ -82460,7 +82472,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4539606987814986, guid: ac16a24c584766f4e905adc7db85b93d, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 61.5448
+      value: 51.2
       objectReference: {fileID: 0}
     - target: {fileID: 4539606987814986, guid: ac16a24c584766f4e905adc7db85b93d, type: 3}
       propertyPath: m_LocalRotation.w
@@ -105100,6 +105112,7 @@ MonoBehaviour:
   spawnIntervalMax: 5
   spawnIntervalMean: 0
   minimumSpawnGap: 5
+  prefillSeconds: 0
   spawnCarMinSpeed: 6
   spawnCarMaxSpeed: 12
   driverVariation:
@@ -109121,6 +109134,7 @@ MonoBehaviour:
   spawnIntervalMax: 5
   spawnIntervalMean: 0
   minimumSpawnGap: 5
+  prefillSeconds: 90
   spawnCarMinSpeed: 6
   spawnCarMaxSpeed: 12
   logSpawns: 0

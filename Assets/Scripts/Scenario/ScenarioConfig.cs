@@ -27,6 +27,10 @@ public class ScenarioConfig
 
     public float alternatePathChance = 0.25f;
 
+    // At scenario start, the road is filled with the cars that would be on it after this many seconds of traffic, so
+    // traffic is already flowing at the crossing (the spawn points are ~370 m away). 0 = start with an empty road.
+    public float trafficPrefillSeconds = 90f;
+
     public bool trafficLightsEnabled = true;
 
     // Environment: night lighting (dark sky, street lamps on, car headlights). See LightingController.
