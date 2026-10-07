@@ -104,7 +104,7 @@ public class ScenarioSelectionPanel : MonoBehaviour
             return;
         }
 
-        float height = Mathf.Min(ReferenceHeight - 20f, 360f + mFiles.Length * 32f);
+        float height = Mathf.Min(ReferenceHeight - 20f, 385f + mFiles.Length * 32f);
         GUILayout.BeginArea(new Rect(10, 10, PanelWidth, height), GUI.skin.box);
         GUILayout.Label("Researcher: scenario", mHeader);
         GUILayout.Label(StatusText(), mSmall);
@@ -163,6 +163,11 @@ public class ScenarioSelectionPanel : MonoBehaviour
                     crossing.SetMidpointFlipEnabled(flip);
                 GUI.enabled = true;
             }
+
+            // Night lighting for the next scenario started (any traffic level). Recorded in the CSV, so locked during a run.
+            GUI.enabled = !mMeasurement.IsMeasuring;
+            mManager.nightMode = GUILayout.Toggle(mManager.nightMode, " Night (applies to the next scenario)");
+            GUI.enabled = true;
             GUILayout.Label($"Results: {MeasurementManager.ResultsFile}", mSmall);
         }
         GUILayout.EndArea();
@@ -176,6 +181,7 @@ public class ScenarioSelectionPanel : MonoBehaviour
         ScenarioConfig s = mManager.currentScenario;
         if (!mManager.IsRunning || s == null)
             return "No scenario running";
-        return $"Running {s.scenarioId} '{s.scenarioName}' · seed {s.randomSeed}" + (CrossingCompleted() ? " · crossing complete" : "");
+        return $"Running {s.scenarioId} '{s.scenarioName}'{(s.night ? " (night)" : "")} · seed {s.randomSeed}" +
+               (CrossingCompleted() ? " · crossing complete" : "");
     }
 }

@@ -34,5 +34,7 @@ public class ScenarioConfig
     public bool trafficLightsEnabled = true;
 
     // Environment: night lighting (dark sky, street lamps on, car headlights). See LightingController.
+    // Set from the researcher panel's "Night" option when a scenario starts (ScenarioManager.nightMode), so any value in a
+    // scenario file is overridden; it is kept here so the applied lighting is part of the scenario settings code.
     public bool night = false;
 }

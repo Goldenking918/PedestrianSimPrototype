@@ -83507,7 +83507,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   controller: {fileID: 1316671050}
-  speed: 12
+  speed: 1.35
   gravity: -9.81
   jumpHeight: 3
   vrCamera: {fileID: 153835501}
