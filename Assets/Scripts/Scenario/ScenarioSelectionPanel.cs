@@ -23,6 +23,7 @@ public class ScenarioSelectionPanel : MonoBehaviour
     MeasurementManager mMeasurement;
     ScenarioManager.ScenarioEntry[] mFiles = new ScenarioManager.ScenarioEntry[0];
     bool mVisible;
+    bool mWasCompleted;
     Vector2 mScroll;
     GUIStyle mHeader, mSmall;
 
@@ -50,6 +51,12 @@ public class ScenarioSelectionPanel : MonoBehaviour
     {
         if (Input.GetKeyDown(toggleKey))
             SetVisible(!mVisible);
+
+        // Participant reached the end: open the panel so the operator can reset or pick the next scenario
+        bool completed = CrossingCompleted();
+        if (completed && !mWasCompleted)
+            SetVisible(true);
+        mWasCompleted = completed;
 
         if (!mVisible || GUIUtility.keyboardControl != 0) // typing in the participant ID box
             return;
@@ -97,10 +104,13 @@ public class ScenarioSelectionPanel : MonoBehaviour
             return;
         }
 
-        float height = Mathf.Min(ReferenceHeight - 20f, 290f + mFiles.Length * 32f);
+        float height = Mathf.Min(ReferenceHeight - 20f, 360f + mFiles.Length * 32f);
         GUILayout.BeginArea(new Rect(10, 10, PanelWidth, height), GUI.skin.box);
         GUILayout.Label("Researcher: scenario", mHeader);
         GUILayout.Label(StatusText(), mSmall);
+        if (CrossingCompleted())
+            GUILayout.Label("Crossing complete. Ask the participant to walk back to the start, then press Restart or pick " +
+                            "a scenario (this brings them back to the start).", mSmall);
         GUILayout.Space(6);
 
         mScroll = GUILayout.BeginScrollView(mScroll);
@@ -126,6 +136,8 @@ public class ScenarioSelectionPanel : MonoBehaviour
             mManager.StopScenario();
         GUI.enabled = true;
         GUILayout.EndHorizontal();
+        if (mManager.playerMovement != null && GUILayout.Button("Return participant to start", GUILayout.Height(24)))
+            mManager.playerMovement.ReturnToStart();
         GUILayout.Label($"[{toggleKey}] hide · number keys start a scenario", mSmall);
 
         if (mMeasurement != null)
@@ -156,11 +168,14 @@ public class ScenarioSelectionPanel : MonoBehaviour
         GUILayout.EndArea();
     }
 
+    bool CrossingCompleted() =>
+        mManager.crossingManager != null && mManager.crossingManager.currentState == CrossingManager.CrossingState.Completed;
+
     string StatusText()
     {
         ScenarioConfig s = mManager.currentScenario;
         if (!mManager.IsRunning || s == null)
             return "No scenario running";
-        return $"Running {s.scenarioId} '{s.scenarioName}' · seed {s.randomSeed}";
+        return $"Running {s.scenarioId} '{s.scenarioName}' · seed {s.randomSeed}" + (CrossingCompleted() ? " · crossing complete" : "");
     }
 }

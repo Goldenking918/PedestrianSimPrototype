@@ -16,6 +16,8 @@ public class ScenarioManager : MonoBehaviour
     public TrafficController trafficController;
     [Tooltip("Reset to the start of the crossing whenever a scenario starts, so every run can be completed. Found automatically if empty.")]
     public CrossingManager crossingManager;
+    [Tooltip("Returned to the start of the crossing whenever a scenario starts. Found automatically if empty.")]
+    public PlayerMovement playerMovement;
     [Tooltip("Scenario file to start automatically on play (e.g. MediumTraffic.json). Leave empty to wait for the researcher to pick one.")]
     public string autoStartScenario = "";
 
@@ -39,6 +41,8 @@ public class ScenarioManager : MonoBehaviour
             trafficController = TrafficController.FindController();
         if (crossingManager == null)
             crossingManager = FindFirstObjectByType<CrossingManager>();
+        if (playerMovement == null)
+            playerMovement = FindFirstObjectByType<PlayerMovement>();
         if (FindFirstObjectByType<MeasurementManager>() == null)
             gameObject.AddComponent<MeasurementManager>();
         if (GetComponent<ScenarioSelectionPanel>() == null)
@@ -148,8 +152,10 @@ public class ScenarioManager : MonoBehaviour
         currentScenario = config;
         CurrentScenarioFile = fileName;
         ApplyScenario();
+        if (playerMovement != null)
+            playerMovement.ReturnToStart(); // every run starts at the beginning of the crossing
         if (crossingManager != null)
-            crossingManager.StartCrossing(); // fresh crossing for every run (does not move the participant)
+            crossingManager.StartCrossing(); // fresh crossing for every run
         trafficController.ApplyToAllSpawners();
         SignalPlan signals = trafficController.ApplySignalPlan(); // restart the lights at phase 1: identical timing every run
         trafficController.StartAllSpawners();
