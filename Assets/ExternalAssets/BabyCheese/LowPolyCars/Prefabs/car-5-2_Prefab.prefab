@@ -1,5 +1,67 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &623308943103505746
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6128215038341902221}
+  m_Layer: 0
+  m_Name: TaillampL
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6128215038341902221
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 623308943103505746}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.118999995, y: 0.0139999995, z: -0.7973333}
+  m_LocalScale: {x: 0.1467, y: 0.0768, z: 0.33333334}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1402814640721591620}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1776490721316848673
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4782705846996259024}
+  m_Layer: 0
+  m_Name: HeadlampL
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4782705846996259024
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1776490721316848673}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.105, y: -0.0033333332, z: 0.6823333}
+  m_LocalScale: {x: 0.0435, y: 0.0381, z: 0.33333334}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1402814640721591620}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6635094110277060924
 GameObject:
   m_ObjectHideFlags: 0
@@ -33,6 +95,10 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 518599941247686801}
+  - {fileID: 4782705846996259024}
+  - {fileID: 4274106181663492231}
+  - {fileID: 6128215038341902221}
+  - {fileID: 1838894114614213582}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &4531716009479649343
@@ -75,13 +141,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarMovement
   waypoints: []
-  speed: 10
-  acceleration: 6
-  deceleration: 8
-  detectionDistance: 3
-  frontProbeOffset: 1.5
-  stopDistance: 1
-  minFollowingSpeed: 0
+  idm:
+    desiredSpeed: 12
+    timeHeadway: 1.5
+    minimumGap: 2
+    maxAcceleration: 1.5
+    comfortableDeceleration: 2
+    accelerationExponent: 4
+  maxDeceleration: 8
+  leaderLookahead: 80
+  leaderLateralTolerance: 1.5
+  crossingVehicleDistance: 8
+  pedestrianInteraction:
+    enabled: 1
+    lookaheadDistance: 60
+    predictionHorizon: 8
+    lateralSafetyMargin: 0.5
+    stopBuffer: 2
+    minimumPedestrianSpeed: 0.25
+    vehicleFirstMargin: 1.5
+    pedestrianFirstMargin: 1
+    releaseHysteresis: 0.3
+    hardSafetyClearance: 0.5
+    logStateChanges: 0
+  signalResponse:
+    lookaheadDistance: 120
+    amberStopDeceleration: 3
+    stopLineGap: 1
+  waypointReachThreshold: 1
+  turnRate: 5
+  drawDebugGizmos: 1
 --- !u!114 &6373577069025333393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -102,6 +191,68 @@ MonoBehaviour:
   wheelRadius: 0.33
   spinAxis: {x: 0, y: 0, z: 1}
   reverseSpinDirection: 0
+--- !u!1 &6991667129692769147
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4274106181663492231}
+  m_Layer: 0
+  m_Name: HeadlampR
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4274106181663492231
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6991667129692769147}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.25466666, y: -0.0033333332, z: 0.6823333}
+  m_LocalScale: {x: 0.0435, y: 0.0381, z: 0.33333334}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1402814640721591620}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7498302962513302055
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1838894114614213582}
+  m_Layer: 0
+  m_Name: TaillampR
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1838894114614213582
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7498302962513302055}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.269, y: 0.0139999995, z: -0.7973333}
+  m_LocalScale: {x: 0.1467, y: 0.0768, z: 0.33333334}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1402814640721591620}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &52027358536155002
 PrefabInstance:
   m_ObjectHideFlags: 0

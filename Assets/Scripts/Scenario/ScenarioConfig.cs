@@ -28,4 +28,7 @@ public class ScenarioConfig
     public float alternatePathChance = 0.25f;
 
     public bool trafficLightsEnabled = true;
+
+    // Environment: night lighting (dark sky, street lamps on, car headlights). See LightingController.
+    public bool night = false;
 }
