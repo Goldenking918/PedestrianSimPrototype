@@ -336,6 +336,37 @@ public class MeasurementTests
     }
 
     [Test]
+    public void SafetyOverride_IsLoggedOnce_AsWouldHaveCollided()
+    {
+        StartRun();
+        CarMovement car = CreateCar(Vector3.zero, 13.9f); // 50 km/h along +x
+        var end = new GameObject("TestWaypoint");
+        mObjects.Add(end);
+        end.transform.position = new Vector3(1000f, 0f, 0f);
+        car.waypoints = new[] { end.transform };
+
+        // Pedestrian suddenly 0.9 m in front of the bumper: far too close for braking to stop the car in time,
+        // so the car's hard safety envelope forces it to stop instead (in reality it would have hit them)
+        mPedestrian.position = new Vector3(2.25f + 0.9f, 0f, 0f);
+        StepAt(0f);
+        Assert.AreEqual(0, car.SafetyOverrideCount, "no override before the car has moved");
+        for (int i = 1; i <= 5; i++)
+        {
+            car.Step(0.02f);       // the override engages on the first step and stays engaged
+            StepAt(i * 0.02f);
+        }
+        mManager.StopMeasuring("stopped by test");
+
+        Assert.GreaterOrEqual(car.SafetyOverrideCount, 1, "the scenario must trigger the safety envelope");
+        List<MeasurementEvent> overrides = EventsNamed("Safety override");
+        Assert.AreEqual(1, overrides.Count, "one event for one engagement, however many frames it lasts");
+        Assert.AreEqual(car.VehicleId, overrides[0].vehicleId);
+        StringAssert.StartsWith("would have collided: car approaching at 13.9 m/s", overrides[0].details,
+            "reports the approach speed before the forced stop, not the speed after it");
+        Assert.IsEmpty(EventsNamed("Collision"), "the car stopped short, so there was no actual contact");
+    }
+
+    [Test]
     public void NothingIsMeasured_DuringTheHalfwayPause()
     {
         StartRun();
