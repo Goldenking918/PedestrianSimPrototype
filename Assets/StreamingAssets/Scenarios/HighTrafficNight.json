@@ -1,0 +1,24 @@
+{
+    "scenarioId": "N2",
+    "scenarioName": "High Traffic (Night)",
+    "randomSeed": 1003,
+
+    "carSpeed": 13.9,
+    "carTimeHeadway": 1.5,
+    "carMinimumGap": 2.0,
+    "carMaxAcceleration": 1.5,
+    "carComfortableDeceleration": 2.0,
+
+    "spawnIntervalMin": 1.5,
+    "spawnIntervalMax": 52.4,
+    "spawnIntervalMean": 6.55,
+
+    "spawnCarMinSpeed": 12.5,
+    "spawnCarMaxSpeed": 15.3,
+
+    "alternatePathChance": 0.1,
+
+    "trafficLightsEnabled": true,
+
+    "night": true
+}

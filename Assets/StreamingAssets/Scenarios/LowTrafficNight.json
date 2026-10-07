@@ -1,0 +1,24 @@
+{
+    "scenarioId": "N0",
+    "scenarioName": "Low Traffic (Night)",
+    "randomSeed": 1001,
+
+    "carSpeed": 13.9,
+    "carTimeHeadway": 1.5,
+    "carMinimumGap": 2.0,
+    "carMaxAcceleration": 1.5,
+    "carComfortableDeceleration": 2.0,
+
+    "spawnIntervalMin": 1.5,
+    "spawnIntervalMax": 90.0,
+    "spawnIntervalMean": 14.5,
+
+    "spawnCarMinSpeed": 12.5,
+    "spawnCarMaxSpeed": 15.3,
+
+    "alternatePathChance": 0.1,
+
+    "trafficLightsEnabled": true,
+
+    "night": true
+}
