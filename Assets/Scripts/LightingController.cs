@@ -22,6 +22,8 @@ public class LightingController : MonoBehaviour
     [Min(0f)] public float moonIntensity = 0.08f;
     public Color nightAmbientColor = new Color(0.03f, 0.035f, 0.05f);
     [Range(0f, 1f)] public float nightSkyExposure = 0.03f;
+    [Tooltip("Colour of the distance haze at night (the day haze colour comes from the scene's Lighting settings).")]
+    public Color nightFogColor = new Color(0.02f, 0.025f, 0.04f);
 
     [Header("Car headlights (night only)")]
     public Color headlightColor = new Color(1f, 0.95f, 0.85f);
@@ -51,6 +53,7 @@ public class LightingController : MonoBehaviour
     Color dayAmbientColor;
     Material daySky;
     float dayReflectionIntensity;
+    Color dayFogColor;
     Material nightSky;
 
     void Awake()
@@ -71,6 +74,7 @@ public class LightingController : MonoBehaviour
         dayAmbientColor = RenderSettings.ambientLight;
         daySky = RenderSettings.skybox;
         dayReflectionIntensity = RenderSettings.reflectionIntensity;
+        dayFogColor = RenderSettings.fogColor;
         SetStreetLights(false);
     }
 
@@ -108,6 +112,7 @@ public class LightingController : MonoBehaviour
         RenderSettings.ambientLight = night ? nightAmbientColor : dayAmbientColor;
         RenderSettings.skybox = night ? NightSky() : daySky;
         RenderSettings.reflectionIntensity = night ? 0.1f : dayReflectionIntensity;
+        RenderSettings.fogColor = night ? nightFogColor : dayFogColor; // distance haze fades into darkness at night
         DynamicGI.UpdateEnvironment();
 
         SetStreetLights(night);

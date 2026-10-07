@@ -3,7 +3,7 @@
     "scenarioName": "Medium Traffic",
     "randomSeed": 1002,
 
-    "carSpeed": 10.0,
+    "carSpeed": 13.9,
     "carTimeHeadway": 1.5,
     "carMinimumGap": 2.0,
     "carMaxAcceleration": 1.5,
@@ -13,8 +13,8 @@
     "spawnIntervalMax": 72.0,
     "spawnIntervalMean": 9.01,
 
-    "spawnCarMinSpeed": 8.0,
-    "spawnCarMaxSpeed": 12.0,
+    "spawnCarMinSpeed": 12.5,
+    "spawnCarMaxSpeed": 15.3,
 
     "alternatePathChance": 0.1,
 

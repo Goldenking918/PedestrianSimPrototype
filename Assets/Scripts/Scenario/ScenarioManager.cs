@@ -222,5 +222,8 @@ public class ScenarioManager : MonoBehaviour
 
         trafficController.alternatePathChance =
             currentScenario.alternatePathChance;
+
+        trafficController.prefillSeconds =
+            currentScenario.trafficPrefillSeconds;
     }
 }
