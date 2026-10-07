@@ -99216,6 +99216,68 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!1 &1572944005
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1572944007}
+  - component: {fileID: 1572944006}
+  m_Layer: 0
+  m_Name: TrafficAudio
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1572944006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1572944005}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 602d6a2593644db42aa34fb6e48105d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TrafficAudio
+  drivingLoops:
+  - {fileID: 8300000, guid: 2768f9aa0287ee54aa75894b2e2bb6ee, type: 3}
+  idleLoops:
+  - {fileID: 8300000, guid: 15a065b4af31a4146b1502d71d580022, type: 3}
+  - {fileID: 8300000, guid: 9c109b7f178441c49850e97bd6a8c59f, type: 3}
+  referenceSpeed: 14
+  idleToDrivingSpeed: 4
+  idleVolume: 0.12
+  drivingVolumeSlow: 0.35
+  drivingVolumeFull: 0.9
+  drivingPitchSlow: 0.8
+  drivingPitchFull: 1.15
+  minDistance: 5
+  maxDistance: 150
+  dopplerLevel: 1
+  ambienceSource: {fileID: 695921418}
+  ambienceLoop: {fileID: 8300000, guid: add64abb1e7acdf4e8261246a11062dd, type: 3}
+  ambienceVolume: 0.5
+--- !u!4 &1572944007
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1572944005}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1574994974
 GameObject:
   m_ObjectHideFlags: 0
@@ -137967,3 +138029,4 @@ SceneRoots:
   - {fileID: 1083677338}
   - {fileID: 460217237}
   - {fileID: 1602912086}
+  - {fileID: 1572944007}
