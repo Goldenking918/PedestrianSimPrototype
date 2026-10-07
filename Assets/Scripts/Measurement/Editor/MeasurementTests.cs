@@ -398,6 +398,23 @@ public class MeasurementTests
         Assert.AreEqual(MeasurementManager.ScenarioSettingsCode(new ScenarioConfig { scenarioId = "S2", scenarioName = "Test Traffic", randomSeed = 1002 }),
             Result.scenarioSettings);
         Assert.AreEqual("On", Result.midpointFlip);
+        Assert.AreEqual("Day", Result.lighting);
+    }
+
+    [Test]
+    public void NightRun_IsRecordedAsNight_AndChangesTheSettingsCode()
+    {
+        StartRun(scenarioId: "S2", seed: 1002);
+        mManager.StopMeasuring("day run");
+        string dayCode = Result.scenarioSettings;
+
+        // As ScenarioManager does when the researcher panel's Night option is ticked
+        mManager.StartMeasuring(new ScenarioConfig { scenarioId = "S2", scenarioName = "Test Traffic", randomSeed = 1002, night = true });
+        mManager.StopMeasuring("night run");
+
+        Assert.AreEqual("Night", Result.lighting);
+        Assert.AreNotEqual(dayCode, Result.scenarioSettings, "same traffic at night must not look identical in the CSV");
+        StringAssert.EndsWith(", night", Result.events[0].details);
     }
 
     [Test]
@@ -427,13 +444,13 @@ public class MeasurementTests
             var r = new MeasurementResult
             {
                 scenario = "Low Traffic", scenarioId = "S1", run = 3, participantId = "P01", dateTime = "2026-10-01 14:02:11",
-                appVersion = "0.2.0", randomSeed = 1001, scenarioSettings = "a3f9c2", midpointFlip = "On",
+                appVersion = "0.2.0", randomSeed = 1001, scenarioSettings = "a3f9c2", midpointFlip = "On", lighting = "Night",
                 waitingTime = 5.2f, crossingDuration = 9.4f, closestVehicleDistance = 2.345f, crossingOutcome = "Completed",
             };
             string row = r.ToCsvRow();
 
             Assert.AreEqual(MeasurementResult.CsvHeader.Split(',').Length, row.Split(',').Length);
-            Assert.AreEqual("Low Traffic,S1,3,P01,2026-10-01 14:02:11,0.2.0,1001,a3f9c2,On,5.20,9.40,2.35,,,Completed", row);
+            Assert.AreEqual("Low Traffic,S1,3,P01,2026-10-01 14:02:11,0.2.0,1001,a3f9c2,On,Night,5.20,9.40,2.35,,,Completed", row);
         }
         finally
         {

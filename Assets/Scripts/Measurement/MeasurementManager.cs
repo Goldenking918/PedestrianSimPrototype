@@ -116,6 +116,7 @@ public class MeasurementManager : MonoBehaviour
             scenarioSettings = ScenarioSettingsCode(scenario),
             // Recorded at the start of the run (the researcher panel locks the setting while a run is being measured)
             midpointFlip = crossingManager == null ? "" : crossingManager.midpointFlipEnabled ? "On" : "Off",
+            lighting = scenario.night ? "Night" : "Day",
         };
         startTime = clock();
         roadEdgeTime = float.NaN;
@@ -127,7 +128,7 @@ public class MeasurementManager : MonoBehaviour
         lastCarSpeed.Clear();
         lastState = crossingManager != null ? crossingManager.currentState : CrossingManager.CrossingState.NotStarted;
         measuring = true;
-        LogEvent(0f, "Scenario started", -1, FormattableString.Invariant($"{result.scenario}, seed {result.randomSeed}, midpoint flip {result.midpointFlip}"));
+        LogEvent(0f, "Scenario started", -1, FormattableString.Invariant($"{result.scenario}, seed {result.randomSeed}, midpoint flip {result.midpointFlip}, {result.lighting.ToLowerInvariant()}"));
         Debug.Log($"[MeasurementManager] Measuring '{result.scenario}' for participant '{participantId}'.", this);
     }
 

@@ -9,7 +9,7 @@ using System.Globalization;
 public class MeasurementResult
 {
     public const string CsvHeader =
-        "Scenario,Scenario ID,Run,Participant ID,Date Time,App Version,Random Seed,Scenario Settings,Midpoint Flip," +
+        "Scenario,Scenario ID,Run,Participant ID,Date Time,App Version,Random Seed,Scenario Settings,Midpoint Flip,Lighting," +
         "Waiting Time (s),Crossing Duration (s),Closest Vehicle Distance (m),Relative Speed (m/s),TTC (s),Crossing Outcome";
 
     public string scenario = "";
@@ -21,6 +21,7 @@ public class MeasurementResult
     public int randomSeed;              // seed of the traffic random number generator
     public string scenarioSettings = ""; // short code that changes whenever any scenario setting changes
     public string midpointFlip = "";    // On or Off: whether this run used the midpoint pause and view flip
+    public string lighting = "";        // Day or Night (chosen in the researcher panel)
 
     public float waitingTime = float.NaN;
     public float crossingDuration = float.NaN;
@@ -37,7 +38,7 @@ public class MeasurementResult
         return string.Join(",",
             Text(scenario), Text(scenarioId), run.ToString(CultureInfo.InvariantCulture), Text(participantId), Text(dateTime),
             Text(appVersion), randomSeed.ToString(CultureInfo.InvariantCulture), Text(scenarioSettings), Text(midpointFlip),
-            Number(waitingTime), Number(crossingDuration), Number(closestVehicleDistance),
+            Text(lighting), Number(waitingTime), Number(crossingDuration), Number(closestVehicleDistance),
             Number(relativeSpeed), Number(timeToCollision), Text(crossingOutcome));
     }
 

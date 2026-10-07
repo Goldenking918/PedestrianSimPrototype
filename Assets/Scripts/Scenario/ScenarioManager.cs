@@ -20,6 +20,9 @@ public class ScenarioManager : MonoBehaviour
     public PlayerMovement playerMovement;
     [Tooltip("Scenario file to start automatically on play (e.g. MediumTraffic.json). Leave empty to wait for the researcher to pick one.")]
     public string autoStartScenario = "";
+    [Tooltip("Run scenarios at night (dark sky, street lamps, car headlights). Set from the researcher panel; applies to the next " +
+             "scenario started. Not remembered between sessions, so every session starts in daylight.")]
+    public bool nightMode = false;
 
     [Header("Legacy in-world UI (optional)")]
     public TMP_Dropdown scenarioDropdown;
@@ -148,6 +151,10 @@ public class ScenarioManager : MonoBehaviour
         }
 
         StopScenario();
+
+        // Lighting is chosen in the researcher panel rather than per scenario file, so any traffic level can run at night.
+        // It is written into the applied config, so it is part of the run's Scenario Settings code and Lighting column.
+        config.night = nightMode;
 
         currentScenario = config;
         CurrentScenarioFile = fileName;
