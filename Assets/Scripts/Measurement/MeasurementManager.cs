@@ -11,7 +11,7 @@ using UnityEngine;
 /// run's events (with times) to MeasurementResults/measurement_events.csv.
 ///
 ///   Scenario started            -> fresh measurements, clock starts at 0
-///   every frame                 -> closest vehicle distance, TTC + relative speed, collision and near-miss checks
+///   every frame                 -> closest vehicle distance, TTC + relative speed, collision, near-miss and safety-override checks
 ///   pedestrian reaches End      -> run ends, outcome Completed (or Collision)
 ///   scenario stopped / restarted / app closed before End -> run ends, outcome Incomplete (or Collision)
 ///
@@ -44,6 +44,8 @@ public class MeasurementManager : MonoBehaviour
     CrossingManager.CrossingState lastState;
     readonly HashSet<int> carsInContact = new HashSet<int>();  // cars currently touching the pedestrian
     readonly HashSet<int> carsInNearMiss = new HashSet<int>(); // cars in an ongoing near-miss encounter
+    readonly Dictionary<int, int> safetyOverridesSeen = new Dictionary<int, int>(); // car -> safety overrides already logged
+    readonly Dictionary<int, float> lastCarSpeed = new Dictionary<int, float>();    // car -> speed in the previous frame (m/s)
 
     public bool IsMeasuring => measuring;
     /// <summary>Results of the most recently finished run (also written to the CSV files).</summary>
@@ -121,6 +123,8 @@ public class MeasurementManager : MonoBehaviour
         collided = false;
         carsInContact.Clear();
         carsInNearMiss.Clear();
+        safetyOverridesSeen.Clear();
+        lastCarSpeed.Clear();
         lastState = crossingManager != null ? crossingManager.currentState : CrossingManager.CrossingState.NotStarted;
         measuring = true;
         LogEvent(0f, "Scenario started", -1, FormattableString.Invariant($"{result.scenario}, seed {result.randomSeed}, midpoint flip {result.midpointFlip}"));
@@ -196,6 +200,22 @@ public class MeasurementManager : MonoBehaviour
             float distance = DistanceToOutline(pedestrian, carPosition, carForward, outline);
             if (float.IsNaN(result.closestVehicleDistance) || distance < result.closestVehicleDistance)
                 result.closestVehicleDistance = distance;
+
+            // --- Safety override ("would have collided") ---
+            // The car's hard safety envelope forced it to stop because its normal (behavioural) braking could not have
+            // stopped it in time: a real driver in that situation would most likely have hit the pedestrian. The simulator
+            // prevents the collision, so this is logged as the virtual-collision measure. One event each time it engages.
+            // The speed reported is the car's speed in the previous frame, i.e. how fast it was approaching before the forced stop.
+            int overrides = car.SafetyOverrideCount;
+            if (!safetyOverridesSeen.TryGetValue(id, out int seen))
+                seen = overrides; // first time this car is seen in the run: only count new overrides
+            if (!lastCarSpeed.TryGetValue(id, out float approachSpeed))
+                approachSpeed = car.CurrentSpeed;
+            if (overrides > seen)
+                LogEvent(now, "Safety override", id,
+                    FormattableString.Invariant($"would have collided: car approaching at {approachSpeed:F1} m/s, stopped {distance:F2} m from the pedestrian"));
+            safetyOverridesSeen[id] = overrides;
+            lastCarSpeed[id] = car.CurrentSpeed;
 
             // --- Collision ---
             // The pedestrian's body (a circle of the collider's radius) touches or overlaps the car's outline.
