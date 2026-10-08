@@ -1,5 +1,6 @@
 using Unity.XR.CoreUtils;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -15,7 +16,26 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("Smoothing when the rig follows a change in ground height, e.g. stepping onto a kerb (s). 0 = snap.")]
     [Min(0f)] public float rigHeightSmoothTime = 0.08f;
 
+    [Header("VR controllers")]
+    [Tooltip("Move with the LEFT controller's thumbstick, relative to where the head is facing, at the same speed as the keyboard.")]
+    public bool thumbstickMove = true;
+    [Tooltip("Turn in steps with the RIGHT controller's thumbstick (left/right). Steps rather than smooth turning, which is less likely to cause discomfort.")]
+    public bool thumbstickSnapTurn = true;
+    [Tooltip("Size of one snap turn (degrees).")]
+    [Range(10f, 90f)] public float snapTurnAngle = 30f;
+    [Tooltip("Thumbstick movement below this is ignored, so a resting thumb or a worn stick doesn't drift.")]
+    [Range(0f, 0.5f)] public float thumbstickDeadZone = 0.15f;
+
     public bool MovementEnabled { get; private set; } = true;
+
+    /// <summary>
+    /// Set while an in-headset menu (e.g. the researcher menu) uses the thumbsticks, so they don't also move or turn the
+    /// participant. Keyboard movement and physical walking are not affected.
+    /// </summary>
+    public static bool SuppressControllerInput { get; set; }
+
+    InputAction moveAction, turnAction;
+    bool snapTurnArmed = true;
 
     Vector3 velocity;
     bool isGrounded;
@@ -29,6 +49,30 @@ public class PlayerMovement : MonoBehaviour
     // Where the rig and collider were when the session started (see ReturnToStart)
     private Vector3 startRigPosition, startBodyPosition;
     private Quaternion startRigRotation, startBodyRotation;
+
+    void Awake()
+    {
+        moveAction = new InputAction("Thumbstick move", InputActionType.Value, "<XRController>{LeftHand}/{Primary2DAxis}", expectedControlType: "Vector2");
+        turnAction = new InputAction("Thumbstick turn", InputActionType.Value, "<XRController>{RightHand}/{Primary2DAxis}", expectedControlType: "Vector2");
+    }
+
+    void OnEnable()
+    {
+        moveAction.Enable();
+        turnAction.Enable();
+    }
+
+    void OnDisable()
+    {
+        moveAction.Disable();
+        turnAction.Disable();
+    }
+
+    void OnDestroy()
+    {
+        moveAction.Dispose();
+        turnAction.Dispose();
+    }
 
     void Start()
     {
@@ -94,9 +138,17 @@ public class PlayerMovement : MonoBehaviour
             velocity.y = -2f;
         }
 
-        // Joystick / keyboard movement
+        // Keyboard movement, or the left thumbstick in VR (whichever is pushed further)
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
+        Vector2 stick = ReadThumbstick(moveAction, thumbstickMove);
+        if (stick.sqrMagnitude > x * x + z * z)
+        {
+            x = stick.x;
+            z = stick.y;
+        }
+
+        SnapTurn(ReadThumbstick(turnAction, thumbstickSnapTurn));
 
         // Move relative to where the camera is facing (mouse look on desktop, head direction in VR)
         Vector3 forward = transform.forward;
@@ -206,6 +258,38 @@ public class PlayerMovement : MonoBehaviour
         {
             controller.Move(offset); // sweeps, so it respects colliders and catches up once clear
         }
+    }
+
+    /// <summary>A controller thumbstick's position, or zero when it is turned off, suppressed, or inside the dead zone.</summary>
+    private Vector2 ReadThumbstick(InputAction action, bool enabled)
+    {
+        if (!enabled || SuppressControllerInput)
+            return Vector2.zero;
+        Vector2 value = action.ReadValue<Vector2>();
+        if (value.magnitude <= thumbstickDeadZone)
+            return Vector2.zero;
+        // Rescale so movement starts from zero at the edge of the dead zone rather than jumping in
+        return value.normalized * Mathf.InverseLerp(thumbstickDeadZone, 1f, Mathf.Min(value.magnitude, 1f));
+    }
+
+    /// <summary>
+    /// One snap turn per push of the right thumbstick to the left or right: turns when it is pushed most of the way, then
+    /// waits for it to come back near the centre. Turns the rig about the head, as the midpoint flip does.
+    /// </summary>
+    private void SnapTurn(Vector2 stick)
+    {
+        if (Mathf.Abs(stick.x) < 0.3f)
+        {
+            snapTurnArmed = true;
+            return;
+        }
+        if (!snapTurnArmed || Mathf.Abs(stick.x) < 0.7f || Mathf.Abs(stick.x) < Mathf.Abs(stick.y) || vrCamera == null)
+            return;
+
+        snapTurnArmed = false;
+        Transform rig = HasSeparateRig() ? cameraRig : (vrCamera.parent != null ? vrCamera.parent : transform);
+        rig.RotateAround(vrCamera.position, Vector3.up, Mathf.Sign(stick.x) * snapTurnAngle);
+        previousCameraLocalPosition = vrCamera.localPosition;
     }
 
     public void SetMovementEnabled(bool enabled)
