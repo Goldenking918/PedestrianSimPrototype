@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -48,6 +50,12 @@ public class ScenarioManager : MonoBehaviour
     /// <summary>True on the standalone Quest (Android) build: scenario files are inside the APK, not plain files.</summary>
     static bool ScenariosPackedInApp => Application.platform == RuntimePlatform.Android;
 
+    /// <summary>Android: scenario files (and the index) read from the APK at startup, by file name.</summary>
+    static readonly Dictionary<string, string> sPackedFiles = new Dictionary<string, string>();
+    /// <summary>False on Android until the scenario files have been read from the APK (always true elsewhere).</summary>
+    public static bool ScenariosLoaded => !ScenariosPackedInApp || sPackedFilesLoaded;
+    static bool sPackedFilesLoaded;
+
     void Awake()
     {
         if (trafficController == null)
@@ -68,11 +76,48 @@ public class ScenarioManager : MonoBehaviour
             gameObject.AddComponent<ScenarioSelectionPanel>();
     }
 
-    void Start()
+    IEnumerator Start()
     {
+        if (ScenariosPackedInApp && !sPackedFilesLoaded)
+            yield return LoadPackedScenarioFiles();
         if (!string.IsNullOrWhiteSpace(autoStartScenario))
             StartScenario(autoStartScenario.Trim());
     }
+
+    /// <summary>
+    /// Android: reads the index and every scenario file listed in it from inside the APK, without blocking the frame.
+    /// streamingAssetsPath is a jar: URL there, which only UnityWebRequest can read.
+    /// </summary>
+    static IEnumerator LoadPackedScenarioFiles()
+    {
+        sPackedFiles.Clear();
+        yield return LoadPackedFile(ScenarioIndexFile);
+        if (!sPackedFiles.TryGetValue(ScenarioIndexFile, out string index))
+            Debug.LogError($"[ScenarioManager] No {ScenarioIndexFile} in {ScenarioDirectory}, so no scenarios can be listed.");
+        foreach (string file in ParseIndex(index))
+            yield return LoadPackedFile(file);
+        sPackedFilesLoaded = true;
+        Debug.Log($"[ScenarioManager] Read {sPackedFiles.Keys.Count(k => k != ScenarioIndexFile)} scenario file(s) from the app package.");
+    }
+
+    static IEnumerator LoadPackedFile(string fileName)
+    {
+        using (UnityWebRequest request = UnityWebRequest.Get(ScenarioDirectory + "/" + fileName))
+        {
+            yield return request.SendWebRequest();
+            if (request.result == UnityWebRequest.Result.Success)
+                sPackedFiles[fileName] = request.downloadHandler.text;
+            else
+                Debug.LogError($"[ScenarioManager] Could not read {fileName} from the app package: {request.error}");
+        }
+    }
+
+    static string[] ParseIndex(string index) =>
+        (index ?? "").Split('\n')
+            .Select(line => line.Trim())
+            .Where(f => f.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
 
     public struct ScenarioEntry
     {
@@ -96,16 +141,7 @@ public class ScenarioManager : MonoBehaviour
     public static string[] GetAvailableScenarioFiles()
     {
         if (ScenariosPackedInApp)
-        {
-            string index = ReadPackedFile(ScenarioIndexFile);
-            if (index == null)
-                Debug.LogError($"[ScenarioManager] No {ScenarioIndexFile} in {ScenarioDirectory}, so no scenarios can be listed.");
-            return (index ?? "").Split('\n')
-                .Select(line => line.Trim())
-                .Where(f => f.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
-                .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
-                .ToArray();
-        }
+            return ParseIndex(ReadPackedFile(ScenarioIndexFile));
         if (!Directory.Exists(ScenarioDirectory))
             return Array.Empty<string>();
         return Directory.GetFiles(ScenarioDirectory, "*.json")
@@ -139,18 +175,8 @@ public class ScenarioManager : MonoBehaviour
         }
     }
 
-    /// <summary>Reads a text file from the scenario folder inside the APK (Android). Returns null if it can't be read.</summary>
-    static string ReadPackedFile(string fileName)
-    {
-        // streamingAssetsPath is a jar: URL on Android, which only UnityWebRequest can read
-        using (UnityWebRequest request = UnityWebRequest.Get(ScenarioDirectory + "/" + fileName))
-        {
-            UnityWebRequestAsyncOperation operation = request.SendWebRequest();
-            var timer = System.Diagnostics.Stopwatch.StartNew();
-            while (!operation.isDone && timer.Elapsed.TotalSeconds < 5) { } // small local file: done almost at once
-            return operation.isDone && request.result == UnityWebRequest.Result.Success ? request.downloadHandler.text : null;
-        }
-    }
+    /// <summary>A file from the scenario folder inside the APK (Android), as read at startup. Null if it couldn't be read.</summary>
+    static string ReadPackedFile(string fileName) => sPackedFiles.TryGetValue(fileName, out string text) ? text : null;
 
     public void StartSelectedScenario()
     {

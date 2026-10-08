@@ -294,6 +294,8 @@ public class HeadsetResearcherPanel : MonoBehaviour
 
     string StatusText()
     {
+        if (!ScenarioManager.ScenariosLoaded)
+            return "Loading scenarios... (close and reopen the menu in a moment)";
         ScenarioConfig s = mManager.currentScenario;
         if (!mManager.IsRunning || s == null)
             return "No scenario running";
