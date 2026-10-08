@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 
@@ -36,5 +37,28 @@ public class ScenarioFileTests
         var ids = ScenarioManager.GetAvailableScenarios().Select(e => e.scenarioId).ToList();
         CollectionAssert.AllItemsAreUnique(ids);
         Assert.AreEqual(ScenarioManager.GetAvailableScenarioFiles().Length, ids.Count, "a scenario file failed to load");
+    }
+
+    [Test]
+    public void ScenarioIndex_ListsEveryScenarioFile()
+    {
+        // The Android (Quest) build can't list the scenario folder inside the APK, so it reads this index instead.
+        // It is rewritten before every build; if this fails, run Tools > Quest > Build APK (or any build) once and commit it.
+        string index = Path.Combine(ScenarioManager.ScenarioDirectory, ScenarioManager.ScenarioIndexFile);
+        Assert.IsTrue(File.Exists(index), $"{index} missing");
+        string[] listed = File.ReadAllLines(index).Where(l => l.Trim().Length > 0).OrderBy(f => f).ToArray();
+        CollectionAssert.AreEqual(ScenarioManager.GetAvailableScenarioFiles().OrderBy(f => f).ToArray(), listed);
+    }
+
+    [TestCase("", 1, "P01")]
+    [TestCase("P01", 1, "P02")]
+    [TestCase("P09", 1, "P10")]
+    [TestCase("P02", -1, "P01")]
+    [TestCase("P01", -1, "")]
+    [TestCase("", -1, "")]
+    [TestCase("pilot3", 1, "P04")]
+    public void HeadsetParticipantId_StepsThroughCodes(string current, int direction, string expected)
+    {
+        Assert.AreEqual(expected, HeadsetResearcherPanel.StepParticipantId(current, direction));
     }
 }

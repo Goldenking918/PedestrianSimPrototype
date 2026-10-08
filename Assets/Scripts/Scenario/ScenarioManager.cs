@@ -1,7 +1,10 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Networking;
 using TMPro;
 
 /// <summary>
@@ -38,6 +41,21 @@ public class ScenarioManager : MonoBehaviour
 
     public static string ScenarioDirectory => Path.Combine(Application.streamingAssetsPath, "Scenarios");
 
+    /// <summary>
+    /// File in the scenario folder listing the scenario files, one per line. Rewritten before every build (see QuestBuild).
+    /// Only read on Android, where StreamingAssets are packed inside the APK, so the folder can't be listed.
+    /// </summary>
+    public const string ScenarioIndexFile = "index.txt";
+
+    /// <summary>True on the standalone Quest (Android) build: scenario files are inside the APK, not plain files.</summary>
+    static bool ScenariosPackedInApp => Application.platform == RuntimePlatform.Android;
+
+    /// <summary>Android: scenario files (and the index) read from the APK at startup, by file name.</summary>
+    static readonly Dictionary<string, string> sPackedFiles = new Dictionary<string, string>();
+    /// <summary>False on Android until the scenario files have been read from the APK (always true elsewhere).</summary>
+    public static bool ScenariosLoaded => !ScenariosPackedInApp || sPackedFilesLoaded;
+    static bool sPackedFilesLoaded;
+
     void Awake()
     {
         if (trafficController == null)
@@ -48,15 +66,58 @@ public class ScenarioManager : MonoBehaviour
             playerMovement = FindFirstObjectByType<PlayerMovement>();
         if (FindFirstObjectByType<MeasurementManager>() == null)
             gameObject.AddComponent<MeasurementManager>();
-        if (GetComponent<ScenarioSelectionPanel>() == null)
+        // Standalone Quest (Android): there is no PC monitor for the IMGUI panel, so the researcher uses a menu in the headset
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            if (GetComponent<HeadsetResearcherPanel>() == null)
+                gameObject.AddComponent<HeadsetResearcherPanel>();
+        }
+        else if (GetComponent<ScenarioSelectionPanel>() == null)
             gameObject.AddComponent<ScenarioSelectionPanel>();
     }
 
-    void Start()
+    IEnumerator Start()
     {
+        if (ScenariosPackedInApp && !sPackedFilesLoaded)
+            yield return LoadPackedScenarioFiles();
         if (!string.IsNullOrWhiteSpace(autoStartScenario))
             StartScenario(autoStartScenario.Trim());
     }
+
+    /// <summary>
+    /// Android: reads the index and every scenario file listed in it from inside the APK, without blocking the frame.
+    /// streamingAssetsPath is a jar: URL there, which only UnityWebRequest can read.
+    /// </summary>
+    static IEnumerator LoadPackedScenarioFiles()
+    {
+        sPackedFiles.Clear();
+        yield return LoadPackedFile(ScenarioIndexFile);
+        if (!sPackedFiles.TryGetValue(ScenarioIndexFile, out string index))
+            Debug.LogError($"[ScenarioManager] No {ScenarioIndexFile} in {ScenarioDirectory}, so no scenarios can be listed.");
+        foreach (string file in ParseIndex(index))
+            yield return LoadPackedFile(file);
+        sPackedFilesLoaded = true;
+        Debug.Log($"[ScenarioManager] Read {sPackedFiles.Keys.Count(k => k != ScenarioIndexFile)} scenario file(s) from the app package.");
+    }
+
+    static IEnumerator LoadPackedFile(string fileName)
+    {
+        using (UnityWebRequest request = UnityWebRequest.Get(ScenarioDirectory + "/" + fileName))
+        {
+            yield return request.SendWebRequest();
+            if (request.result == UnityWebRequest.Result.Success)
+                sPackedFiles[fileName] = request.downloadHandler.text;
+            else
+                Debug.LogError($"[ScenarioManager] Could not read {fileName} from the app package: {request.error}");
+        }
+    }
+
+    static string[] ParseIndex(string index) =>
+        (index ?? "").Split('\n')
+            .Select(line => line.Trim())
+            .Where(f => f.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
 
     public struct ScenarioEntry
     {
@@ -79,6 +140,8 @@ public class ScenarioManager : MonoBehaviour
     /// <summary>Scenario file names (e.g. "LowTraffic.json") available in StreamingAssets/Scenarios, sorted by name.</summary>
     public static string[] GetAvailableScenarioFiles()
     {
+        if (ScenariosPackedInApp)
+            return ParseIndex(ReadPackedFile(ScenarioIndexFile));
         if (!Directory.Exists(ScenarioDirectory))
             return Array.Empty<string>();
         return Directory.GetFiles(ScenarioDirectory, "*.json")
@@ -93,7 +156,9 @@ public class ScenarioManager : MonoBehaviour
         string path = Path.Combine(ScenarioDirectory, fileName);
         try
         {
-            string json = File.ReadAllText(path);
+            string json = ScenariosPackedInApp ? ReadPackedFile(fileName) : File.ReadAllText(path);
+            if (json == null)
+                throw new FileNotFoundException("file not found in the app package");
             if (string.IsNullOrWhiteSpace(json))
                 throw new InvalidDataException("file is empty");
             ScenarioConfig config = JsonUtility.FromJson<ScenarioConfig>(json);
@@ -109,6 +174,9 @@ public class ScenarioManager : MonoBehaviour
             return null;
         }
     }
+
+    /// <summary>A file from the scenario folder inside the APK (Android), as read at startup. Null if it couldn't be read.</summary>
+    static string ReadPackedFile(string fileName) => sPackedFiles.TryGetValue(fileName, out string text) ? text : null;
 
     public void StartSelectedScenario()
     {
