@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Networking;
 using TMPro;
 
 /// <summary>
@@ -38,6 +39,15 @@ public class ScenarioManager : MonoBehaviour
 
     public static string ScenarioDirectory => Path.Combine(Application.streamingAssetsPath, "Scenarios");
 
+    /// <summary>
+    /// File in the scenario folder listing the scenario files, one per line. Rewritten before every build (see QuestBuild).
+    /// Only read on Android, where StreamingAssets are packed inside the APK, so the folder can't be listed.
+    /// </summary>
+    public const string ScenarioIndexFile = "index.txt";
+
+    /// <summary>True on the standalone Quest (Android) build: scenario files are inside the APK, not plain files.</summary>
+    static bool ScenariosPackedInApp => Application.platform == RuntimePlatform.Android;
+
     void Awake()
     {
         if (trafficController == null)
@@ -48,7 +58,13 @@ public class ScenarioManager : MonoBehaviour
             playerMovement = FindFirstObjectByType<PlayerMovement>();
         if (FindFirstObjectByType<MeasurementManager>() == null)
             gameObject.AddComponent<MeasurementManager>();
-        if (GetComponent<ScenarioSelectionPanel>() == null)
+        // Standalone Quest (Android): there is no PC monitor for the IMGUI panel, so the researcher uses a menu in the headset
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            if (GetComponent<HeadsetResearcherPanel>() == null)
+                gameObject.AddComponent<HeadsetResearcherPanel>();
+        }
+        else if (GetComponent<ScenarioSelectionPanel>() == null)
             gameObject.AddComponent<ScenarioSelectionPanel>();
     }
 
@@ -79,6 +95,17 @@ public class ScenarioManager : MonoBehaviour
     /// <summary>Scenario file names (e.g. "LowTraffic.json") available in StreamingAssets/Scenarios, sorted by name.</summary>
     public static string[] GetAvailableScenarioFiles()
     {
+        if (ScenariosPackedInApp)
+        {
+            string index = ReadPackedFile(ScenarioIndexFile);
+            if (index == null)
+                Debug.LogError($"[ScenarioManager] No {ScenarioIndexFile} in {ScenarioDirectory}, so no scenarios can be listed.");
+            return (index ?? "").Split('\n')
+                .Select(line => line.Trim())
+                .Where(f => f.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+                .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+        }
         if (!Directory.Exists(ScenarioDirectory))
             return Array.Empty<string>();
         return Directory.GetFiles(ScenarioDirectory, "*.json")
@@ -93,7 +120,9 @@ public class ScenarioManager : MonoBehaviour
         string path = Path.Combine(ScenarioDirectory, fileName);
         try
         {
-            string json = File.ReadAllText(path);
+            string json = ScenariosPackedInApp ? ReadPackedFile(fileName) : File.ReadAllText(path);
+            if (json == null)
+                throw new FileNotFoundException("file not found in the app package");
             if (string.IsNullOrWhiteSpace(json))
                 throw new InvalidDataException("file is empty");
             ScenarioConfig config = JsonUtility.FromJson<ScenarioConfig>(json);
@@ -107,6 +136,19 @@ public class ScenarioManager : MonoBehaviour
         {
             Debug.LogError($"[ScenarioManager] Could not load scenario '{fileName}': {e.Message}");
             return null;
+        }
+    }
+
+    /// <summary>Reads a text file from the scenario folder inside the APK (Android). Returns null if it can't be read.</summary>
+    static string ReadPackedFile(string fileName)
+    {
+        // streamingAssetsPath is a jar: URL on Android, which only UnityWebRequest can read
+        using (UnityWebRequest request = UnityWebRequest.Get(ScenarioDirectory + "/" + fileName))
+        {
+            UnityWebRequestAsyncOperation operation = request.SendWebRequest();
+            var timer = System.Diagnostics.Stopwatch.StartNew();
+            while (!operation.isDone && timer.Elapsed.TotalSeconds < 5) { } // small local file: done almost at once
+            return operation.isDone && request.result == UnityWebRequest.Result.Success ? request.downloadHandler.text : null;
         }
     }
 
