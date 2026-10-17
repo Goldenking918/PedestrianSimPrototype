@@ -77,14 +77,23 @@ public class ValidationRunner : MonoBehaviour
         bool ok = FindScene();
         if (ok)
         {
-            yield return RunTraffic();
-            yield return RunWalks();
+            if (PhaseRequested("traffic")) yield return RunTraffic();
+            if (PhaseRequested("walks")) yield return RunWalks();
+            if (PhaseRequested("conflict")) yield return RunConflictWalks();
+            if (PhaseRequested("screenshots")) yield return RunScreenshots();
         }
 
         Log(ok ? "Validation finished." : "Validation aborted: scene objects not found.");
         File.WriteAllText(Path.Combine(OutputFolder, "validation_log.txt"), log.ToString());
         Time.captureDeltaTime = 0f;
         Quit(ok ? 0 : 1);
+    }
+
+    // "-pedValidationPhases=conflict,screenshots" runs only those phases; without it every phase runs.
+    static bool PhaseRequested(string phase)
+    {
+        string arg = Environment.GetCommandLineArgs().FirstOrDefault(a => a.StartsWith(CommandLineFlag + "Phases="));
+        return arg == null || arg.Substring(arg.IndexOf('=') + 1).Split(',').Contains(phase);
     }
 
     bool FindScene()
@@ -149,7 +158,7 @@ public class ValidationRunner : MonoBehaviour
                 var overrides = new Dictionary<int, int>();
                 int maxId = -1, minId = int.MaxValue, maxActive = 0, passages = 0, plus = 0, minus = 0;
                 float longestStop = 0f;
-                var fingerprint = new StringBuilder();
+                var passageKeys = new List<(int id, int direction, float t)>();
 
                 while (Time.time - start < TrafficRunSeconds)
                 {
@@ -183,14 +192,15 @@ public class ValidationRunner : MonoBehaviour
                             if (direction > 0) plus++; else minus++;
                             rows.Add(string.Join(",", run, scenarioFile, config.scenarioId, config.randomSeed, code, F($"{step:F4}"), frame,
                                 F($"{t:F3}"), id, direction > 0 ? "+" : "-", F($"{along:F2}"), F($"{car.CurrentSpeed:F2}"), car.IsAlternateRoute ? 1 : 0));
-                            fingerprint.Append(F($"{id}:{direction}:{t:F2};"));
+                            passageKeys.Add((id, direction, t));
                         }
                         lastSide[id] = side;
                     }
                 }
 
                 int spawned = maxId >= minId ? maxId - minId + 1 : 0;
-                string hash = ShortHash(fingerprint.ToString());
+                // Vehicle IDs keep counting across runs in one session, so they are rebased to the run's first vehicle
+                string hash = ShortHash(string.Concat(passageKeys.Select(k => F($"{k.id - minId}:{k.direction}:{k.t:F2};"))));
                 summary.Add(string.Join(",", run, scenarioFile, config.scenarioId, config.randomSeed, code, F($"{step:F4}"),
                     F($"{Time.time - start:F1}"), passages, plus, minus, spawned, maxActive, F($"{longestStop:F1}"), overrides.Values.Sum(), hash));
                 Log(F($"Run {run} {config.scenarioId} step {step:F4}: {passages} passages (+{plus}/-{minus}) in {TrafficRunSeconds:F0} s, ") +
@@ -287,6 +297,164 @@ public class ValidationRunner : MonoBehaviour
             player.ReturnToStart();
             yield return null;
         }
+    }
+
+    // ------------------------------------------------------------------ conflict walks
+
+    // Walks that step off the kerb at fixed times regardless of traffic, so vehicles meet a pedestrian in their path.
+    // Tests the conflict-based yielding and the outcome events (near miss, collision, safety override) in the scene.
+    static readonly string[] ConflictScenarios = { "LowTraffic.json", "MediumTraffic.json", "HighTraffic.json" };
+    const int ConflictDelays = 20;        // delays of 0, 1, ... 19 s before walking
+    const float ConflictSpeed = 1.4f;
+
+    IEnumerator RunConflictWalks()
+    {
+        string file = Path.Combine(OutputFolder, "conflict_walks.csv");
+        var rows = new List<string> { "Walk,Scenario File,Scenario ID,Seed,Delay (s),Speed (m/s),Recorded Outcome,Recorded Crossing Duration (s)," +
+                                      "Recorded Closest Distance (m),Recorded TTC (s),Near Miss Events,Collision Events,Safety Override Events," +
+                                      "Cars Yielding,Hardest Braking (m/s2),Longest Yield Stop (s),Note" };
+        int index = 0;
+        foreach (string scenarioFile in ConflictScenarios)
+        {
+            for (int delay = 0; delay < ConflictDelays; delay++)
+            {
+                index++;
+                Time.captureDeltaTime = 0f;
+                crossingManager.midpointFlipEnabled = true;
+                if (!scenarioManager.StartScenario(scenarioFile))
+                {
+                    Log($"Conflict walk {index}: could not start {scenarioFile}");
+                    continue;
+                }
+                ScenarioConfig config = scenarioManager.currentScenario;
+                float start = Time.time;
+                yield return null;
+                Transform mover = player.cameraRig != null && player.cameraRig != player.transform && !player.cameraRig.IsChildOf(player.transform)
+                    ? player.cameraRig : null;
+                while (Time.time - start < delay)
+                    yield return null;
+
+                var yielding = new HashSet<int>();
+                var stoppedSince = new Dictionary<int, float>();
+                float hardestBraking = 0f, longestYieldStop = 0f;
+                Vector3[] targets = { Flat(roadEdge.bounds.center), Flat(midpoint.bounds.center), Flat(end.bounds.center) };
+                int target = 0;
+                bool completed = false;
+                while (Time.time - start < delay + WalkTimeout)
+                {
+                    float t = Time.time - start;
+                    foreach (CarMovement car in CarMovement.ActiveVehicles)
+                    {
+                        if (car == null || !car.PedestrianConstraintActive) { if (car != null) stoppedSince.Remove(car.VehicleId); continue; }
+                        yielding.Add(car.VehicleId);
+                        hardestBraking = Mathf.Min(hardestBraking, car.AppliedAcceleration);
+                        if (car.CurrentSpeed < 0.1f)
+                        {
+                            if (!stoppedSince.ContainsKey(car.VehicleId)) stoppedSince[car.VehicleId] = t;
+                            longestYieldStop = Mathf.Max(longestYieldStop, t - stoppedSince[car.VehicleId]);
+                        }
+                        else stoppedSince.Remove(car.VehicleId);
+                    }
+                    var state = crossingManager.currentState;
+                    if (state == CrossingManager.CrossingState.Completed) { completed = true; break; }
+                    if (state == CrossingManager.CrossingState.WaitingForTurn) { yield return null; continue; }
+
+                    Vector3 body = Flat(player.transform.position);
+                    Vector3 goal = targets[Mathf.Min(target, targets.Length - 1)];
+                    Vector3 toGoal = goal - body;
+                    if (toGoal.magnitude < 0.3f && target < targets.Length - 1) { target++; continue; }
+                    Vector3 dir = toGoal.sqrMagnitude > 1e-6f ? toGoal.normalized : (targets[2] - targets[0]).normalized;
+                    Vector3 delta = dir * ConflictSpeed * Time.deltaTime;
+                    if (mover != null) mover.position += delta;
+                    else player.controller.Move(delta);
+                    yield return null;
+                }
+                yield return null;
+                MeasurementResult r = measurement != null ? measurement.LastResult : null;
+                bool fresh = completed && r != null && r.scenarioId == config.scenarioId;
+                int nearMiss = fresh ? r.events.Count(e => e.name == "Near miss") : 0;
+                int collisions = fresh ? r.events.Count(e => e.name == "Collision") : 0;
+                int overrides = fresh ? r.events.Count(e => e.name == "Safety override") : 0;
+                rows.Add(string.Join(",", index, scenarioFile, config.scenarioId, config.randomSeed, delay, F($"{ConflictSpeed:F2}"),
+                    fresh ? r.crossingOutcome : "", fresh ? N(r.crossingDuration) : "", fresh ? N(r.closestVehicleDistance) : "",
+                    fresh ? N(r.timeToCollision) : "", nearMiss, collisions, overrides, yielding.Count, N(hardestBraking), N(longestYieldStop),
+                    completed ? "" : "did not reach end within timeout"));
+                Log(F($"Conflict walk {index} {config.scenarioId} delay {delay} s: ") + F($"outcome {(fresh ? r.crossingOutcome : "-")}, ") +
+                    F($"near misses {nearMiss}, collisions {collisions}, overrides {overrides}, yielding cars {yielding.Count}, ") +
+                    F($"hardest braking {hardestBraking:F2} m/s2"));
+                File.WriteAllLines(file, rows);
+
+                scenarioManager.StopScenario();
+                yield return null;
+                player.ReturnToStart();
+                yield return null;
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ screenshots
+
+    // Stills for the report (site photo beside VR view): from head height at the kerb, along the road both ways and across it,
+    // by day and by night, with Medium traffic running. Rendered with a temporary camera, so the VR rig is not changed.
+    IEnumerator RunScreenshots()
+    {
+        string folder = Path.Combine(OutputFolder, "screenshots");
+        Directory.CreateDirectory(folder);
+        Camera source = player.vrCamera != null ? player.vrCamera.GetComponent<Camera>() : Camera.main;
+        Vector3 kerb = Flat(roadEdge.bounds.center) + (Flat(roadEdge.bounds.center) - Flat(end.bounds.center)).normalized * 1.0f + Vector3.up * 1.6f;
+        Vector3 across = (Flat(end.bounds.center) - Flat(roadEdge.bounds.center)).normalized;
+        Vector3 along = Vector3.Cross(Vector3.up, across);
+        var views = new (string name, Vector3 position, Vector3 forward)[]
+        {
+            ("start", source != null ? source.transform.position : kerb, source != null ? Vector3.ProjectOnPlane(source.transform.forward, Vector3.up) : across),
+            ("kerb_across", kerb, across),
+            ("kerb_along_a", kerb, (along + across * 0.15f).normalized),
+            ("kerb_along_b", kerb, (-along + across * 0.15f).normalized),
+        };
+        foreach (bool night in new[] { false, true })
+        {
+            Time.captureDeltaTime = 0f;
+            scenarioManager.nightMode = night;
+            if (!scenarioManager.StartScenario("MediumTraffic.json"))
+                continue;
+            player.SetMovementEnabled(false);
+            float start = Time.time;
+            while (Time.time - start < 20f)
+                yield return null;
+            yield return new WaitForEndOfFrame();
+
+            var go = new GameObject("ValidationScreenshotCamera");
+            Camera cam = go.AddComponent<Camera>();
+            if (source != null)
+            {
+                cam.CopyFrom(source);
+                cam.stereoTargetEye = StereoTargetEyeMask.None;
+            }
+            cam.fieldOfView = 70f;
+            var rt = new RenderTexture(1920, 1080, 24);
+            cam.targetTexture = rt;
+            foreach (var v in views)
+            {
+                cam.transform.SetPositionAndRotation(v.position, Quaternion.LookRotation(v.forward, Vector3.up));
+                cam.Render();
+                RenderTexture.active = rt;
+                var tex = new Texture2D(rt.width, rt.height, TextureFormat.RGB24, false);
+                tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
+                tex.Apply();
+                string path = Path.Combine(folder, $"{(night ? "night" : "day")}_{v.name}.png");
+                File.WriteAllBytes(path, tex.EncodeToPNG());
+                Destroy(tex);
+                Log(F($"Screenshot {path}: camera at {v.position}, facing {v.forward}"));
+            }
+            RenderTexture.active = null;
+            cam.targetTexture = null;
+            Destroy(rt);
+            Destroy(go);
+            scenarioManager.StopScenario();
+            yield return null;
+        }
+        scenarioManager.nightMode = false;
+        player.SetMovementEnabled(true);
     }
 
     // ------------------------------------------------------------------ helpers
