@@ -81,6 +81,8 @@ public class ValidationRunner : MonoBehaviour
             if (PhaseRequested("walks")) yield return RunWalks();
             if (PhaseRequested("conflict")) yield return RunConflictWalks();
             if (PhaseRequested("screenshots")) yield return RunScreenshots();
+            if (PhaseRequested("overhead")) yield return RunOverhead();
+            if (PhaseRequested("panel")) yield return RunPanelCapture();
         }
 
         Log(ok ? "Validation finished." : "Validation aborted: scene objects not found.");
@@ -421,7 +423,7 @@ public class ValidationRunner : MonoBehaviour
             float start = Time.time;
             while (Time.time - start < 20f)
                 yield return null;
-            yield return new WaitForEndOfFrame();
+            // No WaitForEndOfFrame: it never resumes in a batch-mode Editor. cam.Render() below renders on demand anyway.
 
             var go = new GameObject("ValidationScreenshotCamera");
             Camera cam = go.AddComponent<Camera>();
@@ -457,6 +459,120 @@ public class ValidationRunner : MonoBehaviour
         player.SetMovementEnabled(true);
     }
 
+    // ------------------------------------------------------------------ overhead views
+
+    // Plan view (orthographic, straight down) and a high oblique view of the modelled street section by day with Medium
+    // traffic running, framed on the crossing with about 45 m of road either side, for comparison with the aerial photo.
+    IEnumerator RunOverhead()
+    {
+        string folder = Path.Combine(OutputFolder, "screenshots");
+        Directory.CreateDirectory(folder);
+        Camera source = player.vrCamera != null ? player.vrCamera.GetComponent<Camera>() : Camera.main;
+        Vector3 across = (Flat(end.bounds.center) - Flat(roadEdge.bounds.center)).normalized;
+        Vector3 along = Vector3.Cross(Vector3.up, across);
+        Vector3 centre = (Flat(roadEdge.bounds.center) + Flat(end.bounds.center)) * 0.5f;
+
+        Time.captureDeltaTime = 0f;
+        scenarioManager.nightMode = false;
+        if (!scenarioManager.StartScenario("MediumTraffic.json"))
+            yield break;
+        player.SetMovementEnabled(false);
+        float start = Time.time;
+        while (Time.time - start < 20f)
+            yield return null;
+
+        var go = new GameObject("ValidationOverheadCamera");
+        Camera cam = go.AddComponent<Camera>();
+        if (source != null)
+        {
+            cam.CopyFrom(source);
+            cam.stereoTargetEye = StereoTargetEyeMask.None;
+        }
+        cam.nearClipPlane = 0.3f;
+        cam.farClipPlane = 1000f;
+        var rt = new RenderTexture(1920, 1080, 24);
+        cam.targetTexture = rt;
+
+        // Plan: 1920x1080 covering about 96 m along the road and 54 m across it, road running left-right
+        cam.orthographic = true;
+        cam.orthographicSize = 27f;
+        cam.transform.SetPositionAndRotation(centre + Vector3.up * 200f, Quaternion.LookRotation(Vector3.down, across));
+        Capture(cam, rt, Path.Combine(folder, "day_overhead_plan.png"));
+
+        // Oblique: from above the road itself, 55 m along it, looking down the corridor onto the crossing (from the side,
+        // the buildings next to the footpath block the view)
+        cam.orthographic = false;
+        cam.fieldOfView = 60f;
+        Vector3 eye = centre + along * 55f + Vector3.up * 30f;
+        cam.transform.SetPositionAndRotation(eye, Quaternion.LookRotation(centre - eye, Vector3.up));
+        Capture(cam, rt, Path.Combine(folder, "day_overhead_oblique.png"));
+
+        cam.targetTexture = null;
+        Destroy(rt);
+        Destroy(go);
+        scenarioManager.StopScenario();
+        player.SetMovementEnabled(true);
+        yield return null;
+    }
+
+    void Capture(Camera cam, RenderTexture rt, string path)
+    {
+        cam.Render();
+        RenderTexture.active = rt;
+        var tex = new Texture2D(rt.width, rt.height, TextureFormat.RGB24, false);
+        tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
+        tex.Apply();
+        File.WriteAllBytes(path, tex.EncodeToPNG());
+        Destroy(tex);
+        RenderTexture.active = null;
+        Log(F($"Screenshot {path}: camera at {cam.transform.position}, facing {cam.transform.forward}, ") +
+            (cam.orthographic ? F($"orthographic size {cam.orthographicSize}") : F($"fov {cam.fieldOfView}")));
+    }
+
+    // ------------------------------------------------------------------ researcher panel
+
+    // The researcher scenario panel is IMGUI, drawn only into the Game view, so this needs a windowed Editor (not -batchmode).
+    // Starts Medium traffic, opens the panel and captures the Game view as it appears on the researcher's desktop screen.
+    IEnumerator RunPanelCapture()
+    {
+        if (Application.isBatchMode)
+        {
+            Log("Panel capture skipped: the IMGUI panel is only drawn in a windowed Editor (run without -batchmode).");
+            yield break;
+        }
+        string folder = Path.Combine(OutputFolder, "screenshots");
+        Directory.CreateDirectory(folder);
+        Time.captureDeltaTime = 0f;
+        scenarioManager.nightMode = false;
+        if (!scenarioManager.StartScenario("MediumTraffic.json"))
+            yield break;
+        player.SetMovementEnabled(false);
+        float start = Time.time;
+        while (Time.time - start < 10f)
+            yield return null;
+
+        var panel = FindFirstObjectByType<ScenarioSelectionPanel>();
+        if (panel == null)
+        {
+            Log("Panel capture skipped: ScenarioSelectionPanel not found.");
+            yield break;
+        }
+        typeof(ScenarioSelectionPanel).GetMethod("SetVisible", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+            ?.Invoke(panel, new object[] { true });
+        for (int i = 0; i < 30; i++)
+            yield return null;
+
+        string path = Path.Combine(folder, "day_researcher_panel.png");
+        ScreenCapture.CaptureScreenshot(path);
+        for (int i = 0; i < 30 && !File.Exists(path); i++)
+            yield return null;
+        Log(File.Exists(path) ? F($"Screenshot {path}: Game view {Screen.width}x{Screen.height} with the researcher panel open")
+                              : "Panel capture failed: no file written.");
+        scenarioManager.StopScenario();
+        player.SetMovementEnabled(true);
+        yield return null;
+    }
+
     // ------------------------------------------------------------------ helpers
 
     static Vector3 Flat(Vector3 v) => new Vector3(v.x, 0f, v.z);
@@ -475,12 +591,14 @@ public class ValidationRunner : MonoBehaviour
     {
         log.AppendLine(line);
         Debug.Log("[Validation] " + line);
+        File.WriteAllText(Path.Combine(OutputFolder, "validation_log.txt"), log.ToString()); // kept up to date in case a run is cut short
     }
 
     static void Quit(int code)
     {
 #if UNITY_EDITOR
-        if (Application.isBatchMode)
+        // "-pedValidationExit" also closes a windowed Editor (used for the researcher panel capture, which needs a Game view)
+        if (Application.isBatchMode || Environment.GetCommandLineArgs().Contains(CommandLineFlag + "Exit"))
             UnityEditor.EditorApplication.Exit(code);
         else
             UnityEditor.EditorApplication.isPlaying = false;
