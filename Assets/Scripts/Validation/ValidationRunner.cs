@@ -107,9 +107,9 @@ public class ValidationRunner : MonoBehaviour
 
         lineStart = Flat(roadEdge.bounds.center);
         lineEnd = Flat(end.bounds.center);
-        Log(F($"Crossing line {lineStart} -> {lineEnd} ({Vector3.Distance(lineStart, lineEnd):F2} m). " +
-              $"RoadEdge bounds {roadEdge.bounds.center}/{roadEdge.bounds.size}, Midpoint {midpoint.bounds.center}/{midpoint.bounds.size}, " +
-              $"End {end.bounds.center}/{end.bounds.size}. Player start {player.transform.position}"));
+        Log(F($"Crossing line {lineStart} -> {lineEnd} ({Vector3.Distance(lineStart, lineEnd):F2} m). ") +
+              F($"RoadEdge bounds {roadEdge.bounds.center}/{roadEdge.bounds.size}, Midpoint {midpoint.bounds.center}/{midpoint.bounds.size}, ") +
+              F($"End {end.bounds.center}/{end.bounds.size}. Player start {player.transform.position}"));
         return true;
     }
 
@@ -193,8 +193,8 @@ public class ValidationRunner : MonoBehaviour
                 string hash = ShortHash(fingerprint.ToString());
                 summary.Add(string.Join(",", run, scenarioFile, config.scenarioId, config.randomSeed, code, F($"{step:F4}"),
                     F($"{Time.time - start:F1}"), passages, plus, minus, spawned, maxActive, F($"{longestStop:F1}"), overrides.Values.Sum(), hash));
-                Log(F($"Run {run} {config.scenarioId} step {step:F4}: {passages} passages (+{plus}/-{minus}) in {TrafficRunSeconds:F0} s, " +
-                      $"{spawned} vehicles, max active {maxActive}, longest stop {longestStop:F1} s, fingerprint {hash}"));
+                Log(F($"Run {run} {config.scenarioId} step {step:F4}: {passages} passages (+{plus}/-{minus}) in {TrafficRunSeconds:F0} s, ") +
+                      F($"{spawned} vehicles, max active {maxActive}, longest stop {longestStop:F1} s, fingerprint {hash}"));
                 scenarioManager.StopScenario();
                 File.WriteAllLines(file, rows);
                 File.WriteAllLines(summaryFile, summary);
@@ -278,8 +278,8 @@ public class ValidationRunner : MonoBehaviour
                 N(kerbTime), N(recordedWait), N(recordedWait - kerbTime), N(pause), N(observedDuration), N(recordedDuration),
                 N(recordedDuration - observedDuration), N(distance), N(distance / w.speed), fresh ? r.crossingOutcome : "",
                 fresh ? N(r.closestVehicleDistance) : "", fresh ? N(r.timeToCollision) : "", fresh ? r.midpointFlip : "", note));
-            Log(F($"Walk {index} {config.scenarioId} delay {w.delay} s speed {w.speed} m/s: kerb {kerbTime:F2}/{recordedWait:F2} s, " +
-                  $"duration {observedDuration:F2}/{recordedDuration:F2} s, pause {pause:F2} s, outcome {(fresh ? r.crossingOutcome : "-")} {note}"));
+            Log(F($"Walk {index} {config.scenarioId} delay {w.delay} s speed {w.speed} m/s: kerb {kerbTime:F2}/{recordedWait:F2} s, ") +
+                  F($"duration {observedDuration:F2}/{recordedDuration:F2} s, pause {pause:F2} s, outcome {(fresh ? r.crossingOutcome : "-")} {note}"));
             File.WriteAllLines(file, rows);
 
             scenarioManager.StopScenario();
