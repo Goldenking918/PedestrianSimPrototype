@@ -107,3 +107,6 @@ InitTestScene*.unity*
 
 # Measurement results (participant data) - not committed
 /[Mm]easurement[Rr]esults/
+
+# Participant-free validation output (Tools > Validation)
+/ValidationResults/
